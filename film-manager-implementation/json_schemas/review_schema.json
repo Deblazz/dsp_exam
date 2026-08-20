@@ -18,6 +18,10 @@
       "type": "integer",
       "description": "unique identifier of the the user who has received the review invitation"
     },
+    "coreviewerId": {
+      "type": "integer",
+      "description": "unique identifier of the the user who has received the coreview invitation from a reviewer"
+    },
     "completed": {
       "type": "boolean",
       "description": "this property is set to true if the review has been completed, false otherwise",
@@ -59,11 +63,11 @@
         {
           "properties": {
             "completed": {
-              "const": true  
+              "const": true
             }
           },
           "required": [
-            "reviewDate", "rating", "review"
+            "reviewDate", "rating"
           ]
         }
       ]

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id" : "http://www.my-schema.com/draft_schema.json",
+  "title": "Draft",
+  "description": "JSON Schema for Draft data structures",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "path to the JSON Schema to use for the validation of the JSON file describing the draft"
+    },
+    "filmId": {
+      "type": "integer",
+      "description": "unique identifier of the film whose review this draft belongs to"
+    },
+    "reviewerId": {
+      "type": "integer",
+      "description": "unique identifier of the reviewer whose review this draft belongs to"
+    },
+    "version": {
+      "type": "integer",
+      "description": "sequential version number of the draft, where version 0 is the initial empty draft",
+      "minimum": 0
+    },
+    "text": {
+      "type": "string",
+      "description": "the textual content of the draft",
+      "maxLength": 1000
+    },
+    "userRole": {
+      "type": "string",
+      "description": "the role of the user who authored this draft",
+      "enum": ["reviewer", "coreviewer", "initialDraft"]
+    }
+  },
+  "required": ["filmId", "reviewerId", "version", "text", "userRole"]
+}

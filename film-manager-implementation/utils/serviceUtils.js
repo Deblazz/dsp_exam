@@ -56,7 +56,7 @@ exports.getReviewPagination = function (pageNo, filmId) {
 
 exports.createReview = function (row) {
     var completedReview = (row.completed === 1) ? true : false;
-    return new Review(row.fid, row.rid, completedReview, row.reviewDate, row.rating, row.review);
+    return new Review(row.fid, row.rid, completedReview, row.reviewDate, row.rating, row.review, row.coreviewerId);
 }
 
 exports.getFilmSelections = function getFilmSelections() {

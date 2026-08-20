@@ -62,6 +62,9 @@ module.exports.updateSingleReview = function updateSingleReview (req, res, next)
         if(response == "USER_NOT_REVIEWER"){
             utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The user is not a reviewer of the film' }], }, 403);
         }
+        else if (response == "REVIEW_TEXT_REQUIRED") {
+            utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The review property is required when no co-reviewer has been appointed.' }], }, 400);
+        }
         else if (response == "NO_REVIEWS"){
             utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The review does not exist.' }], }, 404);
         }

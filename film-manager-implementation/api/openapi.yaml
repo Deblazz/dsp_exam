@@ -32,9 +32,15 @@ tags:
 - name: api/films/public/{filmId}/reviews
   description: the review invitations (reviews) issued for the public film with ID
     filmId
+- name: api/films/public/{filmId}/reviews/{reviewerId}/coreviewer
+  description: the coreviewer appointed for the review issued to the user with ID reviewerId for the public film with ID filmId
 - name: api/films/public/{filmId}/reviews/{reviewerId}
   description: the review issued to the user with ID reviewerId for the public film
     with ID filmId
+- name: api/films/public/{filmId}/reviews/{reviewerId}/drafts
+  description: the drafts of the review issued to the user with ID reviewerId for the public film with ID filmId
+- name: api/films/public/{filmId}/reviews/{reviewerId}/drafts/current
+  description: the current draft of the review issued to the user with ID reviewerId for the public film with ID filmId
 - name: api/films/public/assignments
   description: the assignments of review invitations to users
 - name: api/users
@@ -507,6 +513,62 @@ paths:
         '500':
           description: Internal Server Error
           content: {}
+  "/api/films/public/{filmId}/reviews/{reviewerId}/coreviewer":
+    post:
+      tags:
+      - api/films/public/{filmId}/reviews/{reviewerId}/coreviewer
+      security:
+      - cookieAuth: []
+      summary: Appoint a coreviewer for a review
+      description: A coreviewer, with coreviewer id specified in the request body, is appointed for the review of the film with ID filmId issued to the reviewer with ID reviewerId. The corresponding review is thus edited. This operation can only be performed by the invited reviewer.
+      operationId: issueFilmCoreview
+      parameters:
+      - name: filmId
+        in: path
+        description: ID of the film
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewerId
+        in: path
+        description: ID of the reviewer
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: The id of the user appointed as co-reviewer
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CoreviewerAssignment"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Review"
+        '400':
+          description: Bad Request
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden (user is not the invited reviewer)
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+        '409':
+          description: Conflict (a coreviewer has already been appointed for the review)
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
   "/api/films/public/{filmId}/reviews/{reviewerId}":
     get:
       tags:
@@ -581,7 +643,8 @@ paths:
           description: No Content
           content: {}
         '400':
-          description: Bad Request
+          description: Bad Request (the completed property is absent, or the review
+            property is absent while no co-reviewer has been appointed)
           content: {}
         '401':
           description: Unauthorized
@@ -635,6 +698,156 @@ paths:
           content: {}
         '409':
           description: Conflict (the review has already been completed)
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
+  "/api/films/public/{filmId}/reviews/{reviewerId}/drafts":
+    get:
+      tags:
+      - api/films/public/{filmId}/reviews/{reviewerId}/drafts
+      security:
+      - cookieAuth: []
+      summary: Retrieve all of the drafts of a given review
+      description: 'The list of drafts of a review of a given film. This operation does require authentication. '
+      operationId: getReviewDrafts
+      parameters:
+      - name: filmId
+        in: path
+        description: ID of the film whose review drafts must be retrieved
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewerId
+        in: path
+        description: ID of the reviewer whose review's drafts must be retrieved
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Draft"
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden (user is neither the reviewer nor the co-reviewer of the review)
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+        '409':
+          description: Conflict (no co-reviewer has been appointed for this review yet)
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
+    post:
+      tags:
+      - api/films/public/{filmId}/reviews/{reviewerId}/drafts
+      security:
+      - cookieAuth: []
+      summary: Submit a new draft
+      description: 'Submit a new draft for a review of a given film. This operation does require authentication. '
+      operationId: submitReviewDraft
+      parameters:
+      - name: filmId
+        in: path
+        description: ID of the film for which the new draft is being submitted
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewerId
+        in: path
+        description: ID of the reviewer whose review the new draft belongs to
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        description: The new draft version being submitted
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewDraft"
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Draft"
+        '400':
+          description: Bad Request
+          content: {}
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden (user is neither the reviewer nor the co-reviewer of the review)
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+        '409':
+          description: Conflict (no co-reviewer has been appointed for this review
+            yet, or the submitted version does not match the expected next version)
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
+  "/api/films/public/{filmId}/reviews/{reviewerId}/drafts/current":
+    get:
+      tags:
+      - api/films/public/{filmId}/reviews/{reviewerId}/drafts/current
+      security:
+      - cookieAuth: []
+      summary: Retrieve the current draft of a given review
+      description: 'The current draft of a review of a given film. This operation does require authentication. '
+      operationId: getCurrentReviewDraft
+      parameters:
+      - name: filmId
+        in: path
+        description: ID of the film whose current review draft must be retrieved
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewerId
+        in: path
+        description: ID of the reviewer whose current review draft must be retrieved
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Draft"
+        '401':
+          description: Unauthorized
+          content: {}
+        '403':
+          description: Forbidden (user is neither the reviewer nor the co-reviewer of the review)
+          content: {}
+        '404':
+          description: Not Found
+          content: {}
+        '409':
+          description: Conflict (no co-reviewer has been appointed for this review yet)
           content: {}
         '500':
           description: Internal Server Error
@@ -975,6 +1188,9 @@ components:
         reviewerId:
           type: integer
           description: unique identifier of the user who has received the review invitation
+        coreviewerId:
+          type: integer
+          description: unique identifier of the the user who has received the coreview invitation from a reviewer
         completed:
           type: boolean
           description: true if the review has been completed, false otherwise
@@ -996,9 +1212,23 @@ components:
         self:
           type: string
           format: uri
+        drafts:
+          type: string
+          format: uri
+          description: the url for the drafts of the review
       required:
       - filmId
       - reviewerId
+    CoreviewerAssignment:
+      description: schema for appointing a co-reviewer to a review
+      type: object
+      additionalProperties: false
+      properties:
+        coreviewerId:
+          type: integer
+          description: unique identifier of the user appointed as co-reviewer
+      required:
+      - coreviewerId
     Reviews:
       description: schema for Reviews data structures
       type: object
@@ -1030,6 +1260,55 @@ components:
           format: uri
       required:
       - totalPages
+    Draft:
+      description: schema for Draft data structures
+      type: object
+      additionalProperties: false
+      properties:
+        "$schema":
+          type: string
+          description: path to the JSON Schema to use for the validation of the JSON
+            data structure describing the draft
+        filmId:
+          type: integer
+          description: unique identifier of the film whose review this draft belongs to
+        reviewerId:
+          type: integer
+          description: unique identifier of the reviewer whose review this draft belongs to
+        version:
+          type: integer
+          description: sequential version number of the draft, where version 0 is the initial empty draft
+          minimum: 0
+        text:
+          type: string
+          description: the textual content of the draft
+          maxLength: 1000
+        userRole:
+          type: string
+          description: the role of the user who authored this draft
+          enum: ["reviewer", "coreviewer", "initialDraft"]
+      required:
+      - filmId
+      - reviewerId
+      - version
+      - text
+      - userRole
+    NewDraft:
+      description: schema for submitting a new draft version
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: integer
+          description: the version number of the new draft being submitted
+          minimum: 1
+        text:
+          type: string
+          description: the textual content of the new draft
+          maxLength: 1000
+      required:
+      - version
+      - text
   securitySchemes:
     cookieAuth:
       description: JWT to identify the authenticated user.
