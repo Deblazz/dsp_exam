@@ -102,12 +102,12 @@ app.delete('/api/films/public/:filmId', isLoggedIn, apiFilmsPublicFilmId.deleteS
 app.get('/api/films/public/:filmId/reviews', apiFilmsPublicFilmIdReviews.getFilmReviews);
 app.post('/api/films/public/:filmId/reviews', isLoggedIn, apiFilmsPublicFilmIdReviews.issueFilmReview);
 app.get('/api/films/public/:filmId/reviews/:reviewerId', apiFilmsPublicFilmIdReviewsReviewerId.getSingleReview);
-app.put('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerId.updateSingleReview);
+app.put('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerId.completeSingleReview);
 app.delete('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerId.deleteSingleReview);
 app.get('/api/films/public/:filmId/reviews/:reviewerId/drafts', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdDrafts.getReviewDrafts);
 app.post('/api/films/public/:filmId/reviews/:reviewerId/drafts', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdDrafts.submitReviewDraft);
 app.get('/api/films/public/:filmId/reviews/:reviewerId/drafts/current', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdDraftsCurrent.getCurrentReviewDraft);
-app.post('/api/films/public/:filmId/reviews/:reviewerId/coreviewer', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdCoreviewer.issueFilmCoreview);
+app.post('/api/films/public/:filmId/reviews/:reviewerId/coreviewer', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdCoreviewer.appointCoreviewer);
 app.get('/api/users', isLoggedIn, apiUsers.getUsers);
 app.post('/api/users/authenticator', apiUsersAuthenticator.authenticateUser);
 app.delete('/api/users/authenticator/current', isLoggedIn,  apiUsersAuthenticatorCurrent.logoutUser);

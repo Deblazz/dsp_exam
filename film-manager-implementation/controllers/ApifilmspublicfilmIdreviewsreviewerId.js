@@ -41,7 +41,7 @@ module.exports.getSingleReview = function getSingleReview (req, res, next) {
         });
 };
 
-module.exports.updateSingleReview = function updateSingleReview (req, res, next) {
+module.exports.completeSingleReview = function completeSingleReview (req, res, next) {
   
   if(req.params.reviewerId != req.user.id)
   {
@@ -54,7 +54,7 @@ module.exports.updateSingleReview = function updateSingleReview (req, res, next)
     utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The completed property is false, but it should be set to true.' }], }, 409);
   }
   else {
-    reviewService.updateSingleReview(req.body, req.params.filmId, req.params.reviewerId)
+    reviewService.completeSingleReview(req.body, req.params.filmId, req.params.reviewerId)
     .then(function(response) {
         utils.writeJson(res, response, 204);
     })

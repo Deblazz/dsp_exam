@@ -521,7 +521,7 @@ paths:
       - cookieAuth: []
       summary: Appoint a coreviewer for a review
       description: A coreviewer, with coreviewer id specified in the request body, is appointed for the review of the film with ID filmId issued to the reviewer with ID reviewerId. The corresponding review is thus edited. This operation can only be performed by the invited reviewer.
-      operationId: issueFilmCoreview
+      operationId: appointCoreviewer
       parameters:
       - name: filmId
         in: path
@@ -616,7 +616,7 @@ paths:
         property to the "true" value, and changing the values of the "reviewDate",
         "rating", and "review" properties. This operation can be performed only by
         the invited reviewer.
-      operationId: updateSingleReview
+      operationId: completeSingleReview
       parameters:
       - name: filmId
         in: path

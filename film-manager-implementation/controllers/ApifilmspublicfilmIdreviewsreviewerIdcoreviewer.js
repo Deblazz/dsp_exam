@@ -3,7 +3,7 @@
 var utils = require('../utils/writer.js');
 const reviewService = require('../service/ReviewsService.js');
 
-module.exports.issueFilmCoreview = function issueFilmCoreview (req, res, next) {
+module.exports.appointCoreviewer = function appointCoreviewer (req, res, next) {
 
   if (req.params.reviewerId != req.user.id) {
     utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The reviewerId is not equal the id of the requesting user.' }], }, 403);

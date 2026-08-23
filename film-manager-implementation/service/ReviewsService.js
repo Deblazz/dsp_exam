@@ -213,7 +213,7 @@ exports.getSingleReview = function (filmId, reviewerId) {
  * reviewerId Long ID of the user to whom the review has been issued
  * no response value expected for this operation
  **/
-exports.updateSingleReview = function (review, filmId, reviewerId) {
+exports.completeSingleReview = function (review, filmId, reviewerId) {
   return new Promise((resolve, reject) => {
 
     const sql1 = "SELECT * FROM reviews WHERE filmId = ? AND reviewerId = ?";
@@ -231,20 +231,20 @@ exports.updateSingleReview = function (review, filmId, reviewerId) {
           if (err)
             reject(err);
           else
-            completeReview(review, filmId, reviewerId, draftRows[0].text, resolve, reject);
+            persistReviewCompletion(review, filmId, reviewerId, draftRows[0].text, resolve, reject);
         });
       }
       else if (review.review == undefined) {
         reject("REVIEW_TEXT_REQUIRED");
       }
       else {
-        completeReview(review, filmId, reviewerId, review.review, resolve, reject);
+        persistReviewCompletion(review, filmId, reviewerId, review.review, resolve, reject);
       }
     });
   });
 }
 
-const completeReview = function (review, filmId, reviewerId, text, resolve, reject) {
+const persistReviewCompletion = function (review, filmId, reviewerId, text, resolve, reject) {
   var sql = 'UPDATE reviews SET completed = ?';
   var parameters = [review.completed];
   if (review.reviewDate != undefined) {
@@ -392,11 +392,13 @@ exports.appointCoreviewer = function (filmId, reviewerId, coreviewerId) {
           else if (rows.length === 0)
             reject("NO_COREVIEWER");
           else {
+            // Update the record appointing a coreviewer
             const sql3 = "UPDATE reviews SET coreviewerId = ? WHERE filmId = ? AND reviewerId = ?";
             db.run(sql3, [coreviewerId, filmId, reviewerId], function (err) {
               if (err)
                 reject(err);
               else {
+                // Create a new empty draft for a review when a new coreviewer is appointed
                 const sql4 = "INSERT INTO drafts (filmId, reviewerId, version, text, userRole) VALUES (?, ?, 0, '', 'initialDraft')";
                 db.run(sql4, [filmId, reviewerId], function (err) {
                   if (err)
