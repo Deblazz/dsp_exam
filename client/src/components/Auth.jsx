@@ -22,7 +22,7 @@ function LoginForm(props) {
     props.login(props.filmManager, credentials)
       .then( () => navigate( "/private" ) )
       .catch((err) => { 
-        setErrorMessage(err.error); setShow(true); 
+        setErrorMessage(err.message); setShow(true); 
       });
   };
 

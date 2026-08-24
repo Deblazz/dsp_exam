@@ -27,6 +27,8 @@ tags:
 - name: api/films/public/invited
   description: the set of the public films for which a review invitation has been
     issued
+- name: api/films/public/coreviewer-invited
+  description: the set of the public films for which a coreview invitation has been issued
 - name: api/films/public/{filmId}
   description: the public film with ID filmId
 - name: api/films/public/{filmId}/reviews
@@ -292,6 +294,37 @@ paths:
       description: The public films that the logged-in user has been invited to review
         are retrieved. A pagination mechanism is used to limit the size of messages.
       operationId: getInvitedFilms
+      parameters:
+      - in: query
+        name: pageNo
+        required: false
+        schema:
+          type: integer
+        description: The id of the requested page (if absent, the first page is returned)
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Films"
+        '401':
+          description: Unauthorized
+          content: {}
+        '500':
+          description: Internal Server Error
+          content: {}
+  "/api/films/public/coreviewer-invited":
+    get:
+      tags:
+      - api/films/public/coreviewer-invited
+      security:
+      - cookieAuth: []
+      summary: Retrieve the public films that the logged-in user has been invited
+        to coreview
+      description: The public films that the logged-in user has been invited to coreview
+        are retrieved. A pagination mechanism is used to limit the size of messages.
+      operationId: getCoreviewerInvitedFilms
       parameters:
       - in: query
         name: pageNo

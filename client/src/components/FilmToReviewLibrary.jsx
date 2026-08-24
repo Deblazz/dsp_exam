@@ -18,7 +18,7 @@ function FilmToReviewTable(props) {
         {
           props.films.map((film) =>
             <PublicFilmRow filmData={film} key={film.id} id={film.id}
-              deleteFilm={props.deleteFilm} updateFilm={props.updateFilm} selectFilm={props.selectFilm} onlineList={props.onlineList} user={props.user}  filmSelections={props.filmSelections}/>
+              deleteFilm={props.deleteFilm} updateFilm={props.updateFilm} selectFilm={props.selectFilm} onlineList={props.onlineList} user={props.user} filmSelections={props.filmSelections}/>
           )
         }
         
@@ -111,6 +111,7 @@ function PublicFilmRow(props) {
         </Link>
       }
       </td>
+
     </tr>
   );
 }

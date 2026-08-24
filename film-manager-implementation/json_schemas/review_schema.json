@@ -35,13 +35,23 @@
     "rating": {
       "type": "integer",
       "description": "the rating the reviewer has given to the film",
-      "minimum": 1,
+      "minimum": 0,
       "maximum": 10
     },
     "review": {
       "type": "string",
       "description": "a textual description of the review",
       "maxLength": 1000
+    },
+    "self": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "hyperlink to the review resource itself, ignored on write if present"
+    },
+    "drafts": {
+      "type": "string",
+      "format": "uri-reference",
+      "description": "hyperlink to the drafts of the review, ignored on write if present"
     }
   },
   "required": ["filmId", "reviewerId", "completed"],

@@ -49,3 +49,7 @@ mqtt_connection.on('close', function () {
 module.exports.publishFilmMessage = function publishFilmMessage(filmId, message) {
     mqtt_connection.publish(String(filmId), JSON.stringify(message), { qos: 0, retain: true })
 };
+
+module.exports.publishDraftMessage = function publishDraftMessage(filmId, reviewerId, message) {
+    mqtt_connection.publish(`films/${filmId}/reviews/${reviewerId}/draft`, JSON.stringify(message), { qos: 0, retain: false })
+}

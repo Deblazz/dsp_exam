@@ -2,11 +2,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './App.css';
 
-import React, { useState, useEffect, useContext, useRef} from 'react';
-import { Container, Toast} from 'react-bootstrap/';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { Container, Toast } from 'react-bootstrap/';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import { PrivateLayout, PublicLayout, PublicToReviewLayout, ReviewLayout, AddPrivateLayout, EditPrivateLayout,  AddPublicLayout, EditPublicLayout, EditReviewLayout, IssueLayout, DefaultLayout, NotFoundLayout, LoginLayout, LoadingLayout, OnlineLayout } from './components/PageLayout';
+import { PrivateLayout, PublicLayout, PublicToReviewLayout, PublicToCoreviewLayout, EditCoreviewLayout, ReviewLayout, AddPrivateLayout, EditPrivateLayout, AddPublicLayout, EditPublicLayout, EditReviewLayout, IssueLayout, AssignCoreviewerLayout, DefaultLayout, NotFoundLayout, LoginLayout, LoadingLayout, OnlineLayout } from './components/PageLayout';
 import { Navigation } from './components/Navigation';
 
 import MessageContext from './messageCtx';
@@ -41,7 +41,7 @@ function App() {
   const handleErrors = (err) => {
     let msg = '';
     if (err.error) msg = err.error;
-    else if (typeof(err) === "string") msg = String(err);
+    else if (typeof (err) === "string") msg = String(err);
     else msg = "Error";
     setMessage(msg); // WARN: a more complex application requires a queue of messages. In this example only last error is shown.
   }
@@ -54,7 +54,7 @@ function App() {
             <Route path="/*" element={<Main />} />
           </Routes>
           <Toast show={message !== ''} onClose={() => setMessage('')} delay={4000} autohide>
-            <Toast.Body>{ message }</Toast.Body>
+            <Toast.Body>{message}</Toast.Body>
           </Toast>
         </Container>
       </MessageContext.Provider>
@@ -82,7 +82,7 @@ function Main() {
   const [filmManager, setFilmManager] = useState({});
 
   // Error messages are managed at context level (like global variables)
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const location = useLocation();
 
@@ -90,9 +90,9 @@ function Main() {
 
   //Film manager resource retrieval
   useEffect(() => {
-    API.getFilmManager().then(fm => {setFilmManager(fm); sessionStorage.setItem('filmManager', JSON.stringify(fm)); console.log(JSON.parse(sessionStorage.getItem('filmManager')))});
+    API.getFilmManager().then(fm => { setFilmManager(fm); sessionStorage.setItem('filmManager', JSON.stringify(fm)); console.log(JSON.parse(sessionStorage.getItem('filmManager'))) });
   },
-  []);
+    []);
 
   //WebSocket and MQTT management
   useEffect(() => {
@@ -103,11 +103,11 @@ function Main() {
       ws.send('Message From Client');
       console.log("onopen")
     };
-    
+
     ws.onerror = (error) => {
       console.log(`WebSocket error: ${error}`)
     };
-    
+
     ws.onmessage = (e) => {
       console.log('WebSocket message received:', e.data.toString()); //TEST
       try {
@@ -158,18 +158,18 @@ function Main() {
               return newArray;
             }
           }
-    
-          if (flag == 0) 
+
+          if (flag == 0)
             newArray.push(datas);
           return newArray;
 
         });
 
-      }  
+      }
     }
-  
+
     socket.current = ws;
-    
+
     mqttClient.on('error', (err) => {
       console.log(err);
       mqttClient.end();
@@ -178,17 +178,19 @@ function Main() {
     mqttClient.on('connect', () => {
       console.log('client connected: ' + clientId);
     });
-
     mqttClient.on('message', (topic, message) => {
-      try {
-        console.log('Received message from topic: ' + topic + ' with message: ' + message);
-        var parsedMessage = JSON.parse(message);
-        if(parsedMessage.typeMessage == "deleted"){
-          mqttClient.unsubscribe(topic);
+      // Differentiate between drafts and film selections by checking if the topic is a number (filmId) or not.
+      if (!isNaN(topic)) {
+        try {
+          console.log('Received message from topic: ' + topic + ' with message: ' + message);
+          var parsedMessage = JSON.parse(message);
+          if (parsedMessage.typeMessage == "deleted") {
+            mqttClient.unsubscribe(topic);
+          }
+          displayFilmSelection(topic, parsedMessage);
+        } catch (error) {
+          console.log(error);
         }
-        displayFilmSelection(topic, parsedMessage);
-      } catch (error) {
-        console.log(error);
       }
     });
 
@@ -210,25 +212,25 @@ function Main() {
       });
     }
   },
-  []);
+    []);
 
   useEffect(() => {
     const init = async () => {
-        setLoading(true);
+      setLoading(true);
 
-        // Define filters 
-        const filters = ['private', 'public', 'public/to_review', 'online'];
-        setFilters(filters);
+      // Define filters 
+      const filters = ['private', 'public', 'public/to_review', 'public/to_coreview', 'online'];
+      setFilters(filters);
 
-        if(sessionStorage.getItem('user') != undefined){
-          setUser(sessionStorage.getItem('user'));
-          setLoggedIn(true);
-          setLoading(false);
-        } else {
-          setUser(null);
-          setLoggedIn(false);
-          setLoading(false);
-        } 
+      if (sessionStorage.getItem('user') != undefined) {
+        setUser(sessionStorage.getItem('user'));
+        setLoggedIn(true);
+        setLoading(false);
+      } else {
+        setUser(null);
+        setLoggedIn(false);
+        setLoading(false);
+      }
     };
     init();
   }, []);  // This useEffect is called only the first time the component is mounted.
@@ -254,10 +256,10 @@ function Main() {
 
   /**
    * This function handles the logout process.
-   */ 
+   */
   const handleLogout = async (filmManager) => {
     await API.logOut(filmManager);
-    
+
     setLoggedIn(false);
     setUser(null);
     sessionStorage.removeItem('user');
@@ -266,7 +268,7 @@ function Main() {
     sessionStorage.removeItem('email');
   };
 
-  
+
 
 
   return (
@@ -276,25 +278,28 @@ function Main() {
       <Routes>
         <Route path="/" element={
           loading ? <LoadingLayout />
-            : loggedIn ? <DefaultLayout filters={filters} onlineList={onlineList}/>
+            : loggedIn ? <DefaultLayout filters={filters} onlineList={onlineList} />
               : <Navigate to="/login" replace state={location} />
         } >
-          <Route index element={<PrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
-          <Route path="private" element={<PrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
-          <Route path="private/add" element={<AddPrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
+          <Route index element={<PrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="private" element={<PrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="private/add" element={<AddPrivateLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
           <Route path="private/edit/:filmId" element={<EditPrivateLayout />} />
-          <Route path="public" element={<PublicLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
-          <Route path="public/add" element={<AddPublicLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
+          <Route path="public" element={<PublicLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="public/add" element={<AddPublicLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
           <Route path="public/edit/:filmId" element={<EditPublicLayout />} />
-          <Route path="public/:filmId/reviews" element={<ReviewLayout/>} />
-          <Route path="public/:filmId/reviews/complete" element={<EditReviewLayout/>} />
-          <Route path="public/:filmId/issue" element={<IssueLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
-          <Route path="public/to_review" element={<PublicToReviewLayout onlineList={onlineList} filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} user={JSON.parse(sessionStorage.getItem('user'))} filmSelections={filmSelections} mqttClient={mqttClient} subscribedTopics={subscribedTopics} setSubscribedTopics={setSubscribedTopics}/>} />
-          <Route path="online" element={<OnlineLayout onlineList={onlineList}/>} />
+          <Route path="public/:filmId/reviews" element={<ReviewLayout />} />
+          <Route path="public/:filmId/reviews/complete" element={<EditReviewLayout mqttClient={mqttClient} />} />
+          <Route path="public/:filmId/reviews/assign-coreviewer" element={<AssignCoreviewerLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="public/:filmId/reviews/:reviewerId/coreview" element={<EditCoreviewLayout mqttClient={mqttClient} />} />
+          <Route path="public/:filmId/issue" element={<IssueLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="public/to_review" element={<PublicToReviewLayout onlineList={onlineList} filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} user={JSON.parse(sessionStorage.getItem('user'))} filmSelections={filmSelections} mqttClient={mqttClient} subscribedTopics={subscribedTopics} setSubscribedTopics={setSubscribedTopics} />} />
+          <Route path="public/to_coreview" element={<PublicToCoreviewLayout filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
+          <Route path="online" element={<OnlineLayout onlineList={onlineList} />} />
           <Route path="*" element={<NotFoundLayout />} />
         </Route>
 
-        <Route path="/login" element={<LoginLayout login={handleLogin} filmManager={JSON.parse(sessionStorage.getItem('filmManager'))}/>} />
+        <Route path="/login" element={<LoginLayout login={handleLogin} filmManager={JSON.parse(sessionStorage.getItem('filmManager'))} />} />
       </Routes>
     </>
   );

@@ -145,7 +145,7 @@ async function updateFilm(film) {
       body: JSON.stringify(film) // dayjs date is serialized correctly by the .toJSON method override
     })
     if(!response.ok){
-      let err = { status: response.status, errObj: response.json };
+      let err = { status: response.status, errObj: response.json() };
       throw err; 
     }
     return response.ok;
@@ -177,7 +177,7 @@ async function deleteFilm(film) {
     credentials: 'include'
   });
   if(!response.ok){
-    let err = { status: response.status, errObj: response.json };
+    let err = { status: response.status, errObj: response.json() };
     throw err; 
   }
   return response.ok;
@@ -211,7 +211,7 @@ async function deleteFilm(film) {
     credentials: 'include'
   });
   if(!response.ok){
-    let err = { status: response.status, errObj: response.json };
+    let err = { status: response.status, errObj: response.json() };
     throw err; 
   }
   return response.ok;
@@ -242,7 +242,7 @@ async function deleteFilm(film) {
       body: JSON.stringify(review) // dayjs date is serialized correctly by the .toJSON method override
     })
     if(!response.ok){
-      let err = { status: response.status, errObj: response.json };
+      let err = { status: response.status, errObj: response.json() };
       throw err; 
     }
     return response.ok;
@@ -285,8 +285,6 @@ const logIn = async (filmManager, credentials) => {
  * This function is used to retrieve the users of the service.
  * It returns a JSON object with the users.
  */
-
-
  async function getUsers(filmManager) {
   const response = await fetch(SERVER + filmManager['users'], {
     credentials: 'include',
@@ -316,6 +314,61 @@ const logOut = async(filmManager) => {
   })
 }
 
+/**
+ * Getting from the server side and returning the list of coreviewer invited films.
+ */
+ const getCoreviewFilms = async (filmManager, pageNumber) => {
+  let path = SERVER + filmManager["coreviewerInvitedFilms"];
+  if(pageNumber != undefined) path += '?pageNo=' + pageNumber;
+  return getJson(fetch(path, { credentials: 'include' })).then( json => { 
+    sessionStorage.setItem('totalPages',  json.totalPages);
+    sessionStorage.setItem('currentPage', json.currentPage);
+    sessionStorage.setItem('totalItems',  json.totalItems);
+    sessionStorage.setItem('filmsType',  'public');
+    if(json.totalPages != 0)
+      return json.films.map((film) => new Film(film));
+    else
+      return [];
+  })
+}
 
-const API = {logIn, getUsers, getFilmManager, getPrivateFilms, getPublicFilms, getFilmReviews, updateFilm, deleteFilm, addFilm, getFilm, issueReview, deleteReview, getReview, updateReview, getPublicFilmsToReview, selectFilm, logOut};
+/**
+ * Getting from the server side and returning the current draft.
+ */
+ const getCurrentDraft = async (review) => {
+  return getJson(fetch(SERVER + review.drafts + "/current", { credentials: 'include' }))
+    .then(draft => { return draft; })
+}
+
+/**
+ * Submitting a new draft to the server.
+ */
+const submitDraft = async (review, draft) => {
+  var draftToSubmit = { ...draft, version: draft.version + 1 };
+  return getJson(fetch(SERVER + review.drafts, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify(draftToSubmit)
+  }))
+}
+
+/**
+ * Appointing a coreviewer to a review.
+ */
+const appointCoreviewer = async (review, coreviewerId) => {
+  return getJson(fetch(SERVER + review.self + "/coreviewer", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ coreviewerId: coreviewerId })
+  }))
+}
+
+
+const API = {logIn, getUsers, getFilmManager, getPrivateFilms, getPublicFilms, getFilmReviews, updateFilm, deleteFilm, addFilm, getFilm, issueReview, deleteReview, getReview, updateReview, getPublicFilmsToReview, selectFilm, logOut, getCoreviewFilms, getCurrentDraft, submitDraft, appointCoreviewer};
 export default API;

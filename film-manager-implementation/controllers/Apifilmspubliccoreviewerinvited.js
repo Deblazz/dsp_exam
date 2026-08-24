@@ -4,11 +4,11 @@ var utils = require('../utils/writer.js');
 const filmService = require('../service/FilmsService.js');
 const constants = require('../utils/constants.js');
 
-module.exports.getInvitedFilms = function getInvitedFilms(req, res, next) {
+module.exports.getCoreviewerInvitedFilms = function getCoreviewerInvitedFilms(req, res, next) {
   var numOfFilms = 0;
   var next = 0;
 
-  filmService.getInvitedFilmsTotal(req.user.id)
+  filmService.getCoreviewerInvitedFilmsTotal(req.user.id)
     .then(function (response) {
       numOfFilms = response;
       if (numOfFilms == 0) {
@@ -19,7 +19,7 @@ module.exports.getInvitedFilms = function getInvitedFilms(req, res, next) {
           films: [],
         });
       }
-      filmService.getInvitedFilms(req.user.id, req.query.pageNo)
+      filmService.getCoreviewerInvitedFilms(req.user.id, req.query.pageNo)
         .then(function (response) {
           if (req.query.pageNo == null) var pageNo = 1;
           else var pageNo = req.query.pageNo;
@@ -40,7 +40,7 @@ module.exports.getInvitedFilms = function getInvitedFilms(req, res, next) {
               currentPage: pageNo,
               totalItems: numOfFilms,
               films: response,
-              next: "/api/films/public/invited?pageNo=" + next
+              next: "/api/films/public/coreviewer-invited?pageNo=" + next
             });
           }
         })

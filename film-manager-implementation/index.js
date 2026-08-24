@@ -27,6 +27,7 @@ const apiFilmsPublicFilmIdReviewsReviewerIdCoreviewer = require('./controllers/A
 const apiFilmsPublicFilmIdReviewsReviewerId = require('./controllers/ApifilmspublicfilmIdreviewsreviewerId.js');
 const apiFilmsPublicInvited = require('./controllers/Apifilmspublicinvited.js');
 const apiFilmsPublicAssignments = require('./controllers/Apifilmspublicassignments.js');
+const apiFilmsPublicCoreviewerInvited = require('./controllers/Apifilmspubliccoreviewerinvited.js');
 
 const apiUsers = require('./controllers/Apiusers.js');
 const apiUsersUserId = require('./controllers/ApiusersuserId.js');
@@ -96,13 +97,14 @@ app.get('/api/films/private/:filmId', isLoggedIn, apiFilmsPrivateFilmId.getSingl
 app.put('/api/films/private/:filmId', isLoggedIn, validate({ body: filmSchema }), apiFilmsPrivateFilmId.updateSinglePrivateFilm);
 app.delete('/api/films/private/:filmId', isLoggedIn, apiFilmsPrivateFilmId.deleteSinglePrivateFilm);
 app.get('/api/films/public/invited', isLoggedIn, apiFilmsPublicInvited.getInvitedFilms);
+app.get('/api/films/public/coreviewer-invited', isLoggedIn, apiFilmsPublicCoreviewerInvited.getCoreviewerInvitedFilms);
 app.get('/api/films/public/:filmId', apiFilmsPublicFilmId.getSinglePublicFilm);
 app.put('/api/films/public/:filmId', isLoggedIn, validate({ body: filmSchema }), apiFilmsPublicFilmId.updateSinglePublicFilm);
 app.delete('/api/films/public/:filmId', isLoggedIn, apiFilmsPublicFilmId.deleteSinglePublicFilm);
 app.get('/api/films/public/:filmId/reviews', apiFilmsPublicFilmIdReviews.getFilmReviews);
 app.post('/api/films/public/:filmId/reviews', isLoggedIn, apiFilmsPublicFilmIdReviews.issueFilmReview);
 app.get('/api/films/public/:filmId/reviews/:reviewerId', apiFilmsPublicFilmIdReviewsReviewerId.getSingleReview);
-app.put('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerId.completeSingleReview);
+app.put('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, validate({ body: reviewSchema }), apiFilmsPublicFilmIdReviewsReviewerId.completeSingleReview);
 app.delete('/api/films/public/:filmId/reviews/:reviewerId', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerId.deleteSingleReview);
 app.get('/api/films/public/:filmId/reviews/:reviewerId/drafts', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdDrafts.getReviewDrafts);
 app.post('/api/films/public/:filmId/reviews/:reviewerId/drafts', isLoggedIn, apiFilmsPublicFilmIdReviewsReviewerIdDrafts.submitReviewDraft);

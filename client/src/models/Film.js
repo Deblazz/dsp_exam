@@ -1,9 +1,9 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 /**
  * Constructor function for new Film objects
 */
-function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self, reviews} = {}) {
+function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self, reviews, reviewerId } = {}) {
 
     if(id)
          this.id = id;
@@ -15,6 +15,8 @@ function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self
         this.watchDate = dayjs(watchDate);
     }
         
+    if(reviewerId)
+        this.reviewerId = reviewerId;
     if(rating)
         this.rating = parseInt(rating);
     if(favorite != undefined)

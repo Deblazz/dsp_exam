@@ -73,16 +73,16 @@ exports.getPrivateFilms = function (userId, pageNo) {
  * 
  **/
 exports.getPrivateFilmsTotal = function (userId) {
-    return new Promise((resolve, reject) => {
-        var sqlNumOfFilms = "SELECT count(*) total FROM films f WHERE private = 1 AND owner = ? ";
-        db.get(sqlNumOfFilms, [userId], (err, size) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(size.total);
-            }
-        });
+  return new Promise((resolve, reject) => {
+    var sqlNumOfFilms = "SELECT count(*) total FROM films f WHERE private = 1 AND owner = ? ";
+    db.get(sqlNumOfFilms, [userId], (err, size) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(size.total);
+      }
     });
+  });
 }
 
 
@@ -121,16 +121,16 @@ exports.getPublicFilms = function (pageNo) {
  * 
  **/
 exports.getPublicFilmsTotal = function () {
-    return new Promise((resolve, reject) => {
-        var sqlNumOfFilms = "SELECT count(*) total FROM films f WHERE private = 0 ";
-        db.get(sqlNumOfFilms, [], (err, size) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(size.total);
-            }
-        });
+  return new Promise((resolve, reject) => {
+    var sqlNumOfFilms = "SELECT count(*) total FROM films f WHERE private = 0 ";
+    db.get(sqlNumOfFilms, [], (err, size) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(size.total);
+      }
     });
+  });
 }
 
 
@@ -171,16 +171,16 @@ exports.getInvitedFilms = function (userId, pageNo) {
  * 
  **/
 exports.getInvitedFilmsTotal = function (reviewerId) {
-    return new Promise((resolve, reject) => {
-        var sqlNumOfFilms = "SELECT count(*) total FROM films f, reviews r WHERE  f.private = 0 AND f.id = r.filmId AND r.reviewerId = ? ";
-        db.get(sqlNumOfFilms, [reviewerId], (err, size) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(size.total);
-            }
-        });
+  return new Promise((resolve, reject) => {
+    var sqlNumOfFilms = "SELECT count(*) total FROM films f, reviews r WHERE  f.private = 0 AND f.id = r.filmId AND r.reviewerId = ? ";
+    db.get(sqlNumOfFilms, [reviewerId], (err, size) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(size.total);
+      }
     });
+  });
 }
 
 
@@ -193,61 +193,73 @@ exports.getInvitedFilmsTotal = function (reviewerId) {
  * Output:
  * - no response expected for this operation
  **/
- exports.deleteSinglePublicFilm = function(filmId, owner) {
+exports.deleteSinglePublicFilm = function (filmId, owner) {
   return new Promise((resolve, reject) => {
-      const sql1 = "SELECT owner FROM films f WHERE f.id = ?";
-      db.all(sql1, [filmId], (err, rows) => {
-          if (err)
-              reject(err);
-          else if (rows.length === 0)
-              reject("NO_FILMS");
-          else if(rows[0].private == 1)
-            reject("NO_PUBLIC_FILM");
-          else if(owner != rows[0].owner) {
-              reject("USER_NOT_OWNER");
+    const sql1 = "SELECT owner FROM films f WHERE f.id = ?";
+    db.all(sql1, [filmId], (err, rows) => {
+      if (err)
+        reject(err);
+      else if (rows.length === 0)
+        reject("NO_FILMS");
+      else if (rows[0].private == 1)
+        reject("NO_PUBLIC_FILM");
+      else if (owner != rows[0].owner) {
+        reject("USER_NOT_OWNER");
+      }
+      else {
+        const sql2 = 'SELECT active, reviewerId FROM reviews WHERE filmId = ?';
+        db.all(sql2, [filmId], (err, rows2) => {
+          if (err) {
+            return reject(err);
           }
-          else {
-              const sql2 = 'DELETE FROM reviews WHERE filmId = ?';
-              db.all(sql2, [filmId], (err, rows2) => {
-                  var activeReviewer = [];
-                  for(const row of rows2){
-                      if(row.active == 1){
-                          activeReviewer.push(row.reviewerId);
-                      }
-                  }
-                  const sql3 = 'DELETE FROM reviews WHERE filmId = ?';
-                  db.run(sql3, [filmId], (err) => {
-                      if (err)
-                          reject(err);
-                      else {
-                          const sql4 = 'DELETE FROM films WHERE id = ?';
-                          db.run(sql4, [filmId], (err) => {
-                              if (err)
-                                  reject(err);
-                              else{
-                                  // delete the retained message for the deleted film from the MQTT broker
-                                  mqtt.publishFilmMessage(filmId, new MQTTMessage("deleted", null, null));
-                                  // mqtt.publishFilmMessage(filmId, null); //uncomment this line to delete retained message
 
-                                  //if the film was active for some users, inform the clients that it is not active anymore because it has been deleted
-                                  if(activeReviewer.length != 0)
-                                  {
-                                    for (var i = 0; i < activeReviewer.length; i++) {
-                                        var oldMessage = WebSocket.getMessage(activeReviewer[i]);
-                                        var updateMessage = new WSMessage('update', parseInt(activeReviewer[i]), oldMessage.userName, null, null);
-                                        WebSocket.sendAllClients(updateMessage);
-                                        WebSocket.saveMessage(activeReviewer[i], new WSMessage('login', parseInt(activeReviewer[i]), oldMessage.userName, null, null));
-                                    } 
-                                  }
-  
-                                  resolve(null);
-                              }
-                          })
-                      }
-                  })
-              })
+          var activeReviewer = [];
+          for (const row of rows2) {
+            if (row.active == 1) {
+              activeReviewer.push(row.reviewerId);
+            }
           }
-      });
+          const sql3 = 'DELETE FROM drafts WHERE filmId = ?';
+          db.run(sql3, [filmId], (err) => {
+            if (err)
+              reject(err);
+            else {
+              const sql4 = 'DELETE FROM reviews WHERE filmId = ?';
+              db.run(sql4, [filmId], (err) => {
+                if (err)
+                  reject(err);
+                else {
+                  const sql5 = 'DELETE FROM films WHERE id = ?';
+                  db.run(sql5, [filmId], (err) => {
+                    if (err)
+                      reject(err);
+                    else {
+                      // delete the retained message for the deleted film from the MQTT broker
+                      mqtt.publishFilmMessage(filmId, new MQTTMessage("deleted", null, null));
+                      // mqtt.publishFilmMessage(filmId, null); //uncomment this line to delete retained message
+
+                      //if the film was active for some users, inform the clients that it is not active anymore because it has been deleted
+                      if (activeReviewer.length != 0) {
+                        for (var i = 0; i < activeReviewer.length; i++) {
+                          var oldMessage = WebSocket.getMessage(activeReviewer[i]);
+                          if (oldMessage) {
+                            var updateMessage = new WSMessage('update', parseInt(activeReviewer[i]), oldMessage.userName, null, null);
+                            WebSocket.sendAllClients(updateMessage);
+                            WebSocket.saveMessage(activeReviewer[i], new WSMessage('login', parseInt(activeReviewer[i]), oldMessage.userName, null, null));
+                          }
+                        }
+                      }
+
+                      resolve(null);
+                    }
+                  })
+                }
+              })
+            }
+          })
+        })
+      }
+    });
   });
 }
 
@@ -400,11 +412,11 @@ exports.updateSinglePrivateFilm = function (film, filmId, owner) {
       if (err)
         reject(err);
       else if (rows.length === 0)
-        reject("NO_FILMS" );
+        reject("NO_FILMS");
       else if (rows[0].private == 0)
-        reject("NO_PRIVATE_FILM" )
+        reject("NO_PRIVATE_FILM")
       else if (owner != rows[0].owner) {
-        reject("USER_NOT_OWNER" );
+        reject("USER_NOT_OWNER");
       }
       else {
 
@@ -439,3 +451,54 @@ exports.updateSinglePrivateFilm = function (film, filmId, owner) {
   });
 }
 
+/**
+ * Retrieve the number of public films for which the user has received a coreview invitation
+ * 
+ * Input: 
+ * - coreviewerId: the ID of the coreviewer
+ * Output:
+ * - total number of public films for which the user has received a coreview invitation
+ * 
+ **/
+exports.getCoreviewerInvitedFilmsTotal = function (coreviewerId) {
+  return new Promise((resolve, reject) => {
+    var sqlNumOfFilms = "SELECT count(*) total FROM films f, reviews r WHERE  f.private = 0 AND f.id = r.filmId AND r.coreviewerId = ? ";
+    db.get(sqlNumOfFilms, [coreviewerId], (err, size) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(size.total);
+      }
+    });
+  });
+}
+
+/**
+ * Retrieve the public films that the logged-in user has been invited to coreview
+ * The public films that the logged-in user has been invited to coreview are retrieved. A pagination mechanism is used to limit the size of messages.
+ *
+ * Input: 
+ * - coreviewerId: the ID of the coreviewer
+ * - pageNo Integer The id of the requested page (if absent, the first page is returned) (optional)
+ * Output:
+ * - Array of Film objects for which the user has received a coreview invitation
+ * 
+ **/
+exports.getCoreviewerInvitedFilms = function (coreviewerId, pageNo) {
+  return new Promise((resolve, reject) => {
+    var sql = "SELECT f.id as fid, f.title, f.owner, f.private, f.watchDate, f.rating, f.favorite, r.reviewerId, c.total_rows FROM films f, reviews r, (SELECT count(*) total_rows FROM films f2, reviews r2 WHERE f2.private=0 AND f2.id = r2.filmId AND r2.coreviewerId = ?) c WHERE  f.private = 0 AND f.id = r.filmId AND r.coreviewerId = ?"
+    var limits = serviceUtils.getFilmPagination(pageNo);
+    if (limits.length != 0) sql = sql + " LIMIT ?,?";
+    limits.unshift(coreviewerId);
+    limits.unshift(coreviewerId);
+
+    db.all(sql, limits, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        let films = rows.map((row) => serviceUtils.createFilm(row));
+        resolve(films);
+      }
+    });
+  });
+}

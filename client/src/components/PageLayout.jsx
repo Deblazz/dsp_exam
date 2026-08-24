@@ -5,9 +5,12 @@ import { Link, useParams, useLocation, Outlet, Navigate } from 'react-router-dom
 import PrivateFilmForm from './PrivateFilmForm';
 import PublicFilmForm from './PublicFilmForm';
 import ReviewForm from './ReviewForm';
+import CoreviewForm from './CoreviewForm';
+import AssignCoreviewerForm from './AssignCoreviewerForm';
 import PrivateFilmTable from './PrivateFilmLibrary';
 import PublicFilmTable from './PublicFilmLibrary';
 import FilmToReviewTable from './FilmToReviewLibrary';
+import FilmToCoreviewTable from './FilmToCoreviewLibrary';
 import FilmReviewTable from './FilmReviewLibrary';
 import IssueReviewTable from './IssueReviewLibrary';
 import { LoginForm } from './Auth';
@@ -28,13 +31,15 @@ function DefaultLayout(props) {
   const location = useLocation();
 
   var filterId = false;
-  if(location.pathname == "/private"){
+  if (location.pathname == "/private") {
     filterId = "private";
-  } else if(location.pathname == "/public"){
+  } else if (location.pathname == "/public") {
     filterId = "public";
-  } else if(location.pathname == "/public/to_review"){
+  } else if (location.pathname == "/public/to_review") {
     filterId = "public/to_review";
-  } else if(location.pathname == "/online"){
+  } else if (location.pathname == "/public/to_coreview") {
+    filterId = "public/to_coreview";
+  } else if (location.pathname == "/online") {
     filterId = "online";
   }
 
@@ -59,7 +64,7 @@ function PrivateLayout(props) {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
 
   const { filterLabel } = useParams();
@@ -76,32 +81,32 @@ function PrivateLayout(props) {
           setFilms(films);
           setDirty(false);
         })
-        .catch(e => handleErrors(e)); 
+        .catch(e => handleErrors(e));
     }
   }, [dirty]);
 
   const deleteFilm = (film) => {
     API.deleteFilm(film)
-      .then(() => { setDirty(true);})
-      .catch(e => handleErrors(e)); 
+      .then(() => { setDirty(true); })
+      .catch(e => handleErrors(e));
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
-      .then(() => {setDirty(true); })
-      .catch(e => {handleErrors(e)}); 
+      .then(() => { setDirty(true); })
+      .catch(e => { handleErrors(e) });
   }
 
   const refreshFilms = pageNumber => {
     API.getPrivateFilms(props.filmManager, pageNumber)
-    .then(films => {
-      setFilms(films);
-      setDirty(false);
-    })
-    .catch(e => handleErrors(e));
+      .then(films => {
+        setFilms(films);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
   }
 
-  
+
 
   return (
     <>
@@ -117,11 +122,11 @@ function PrivateLayout(props) {
 
 function AddPrivateLayout(props) {
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const addFilm = (filmManager, film) => {
     API.addFilm(filmManager, film)
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
   return (
     <PrivateFilmForm filmManager={props.filmManager} addFilm={addFilm} />
@@ -130,30 +135,30 @@ function AddPrivateLayout(props) {
 
 function EditPrivateLayout() {
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const { filmId } = useParams();
   const [film, setFilm] = useState(null);
 
   const location = useLocation();
 
-  if(location.state == null)  
+  if (location.state == null)
     return <Navigate replace to='/*' />
 
   useEffect(() => {
     API.getFilm(location.state[0].film)
       .then(film => {
-        if(film.owner == parseInt(sessionStorage.getItem('userId')))
+        if (film.owner == parseInt(sessionStorage.getItem('userId')))
           setFilm(film);
       })
       .catch(e => {
-        handleErrors(e); 
-      }); 
+        handleErrors(e);
+      });
   }, [filmId]);
 
   const editFilm = (film) => {
     API.updateFilm(film)
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
 
   return (
@@ -168,7 +173,7 @@ function PublicLayout(props) {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
 
   const { filterLabel } = useParams();
@@ -186,29 +191,29 @@ function PublicLayout(props) {
           setFilms(films);
           setDirty(false);
         })
-        .catch(e => { handleErrors(e);  } ); 
+        .catch(e => { handleErrors(e); });
     }
   }, [dirty]);
 
   const deleteFilm = (film) => {
     API.deleteFilm(film)
-      .then(() => { setDirty(true);})
-      .catch(e => handleErrors(e)); 
+      .then(() => { setDirty(true); })
+      .catch(e => handleErrors(e));
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
 
   const refreshFilms = pageNumber => {
     API.getPublicFilms(props.filmManager, pageNumber)
-    .then(films => {
-      setFilms(films);
-      setDirty(false);
-    })
-    .catch(e => handleErrors(e));
+      .then(films => {
+        setFilms(films);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
   }
 
   return (
@@ -230,7 +235,7 @@ function PublicToReviewLayout(props) {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
 
   const { filterLabel } = useParams();
@@ -246,17 +251,17 @@ function PublicToReviewLayout(props) {
     if (dirty) {
       API.getPublicFilmsToReview(props.filmManager)
         .then(films => {
-          for(var i=0; i < films.length; i++){
+          for (var i = 0; i < films.length; i++) {
             var tmpArray = props.subscribedTopics.slice();
             var included = false;
-            for(var j=0; j < tmpArray.length; j++){
-              if(tmpArray[j] == parseInt(films[i].id)){
+            for (var j = 0; j < tmpArray.length; j++) {
+              if (tmpArray[j] == parseInt(films[i].id)) {
                 included = true;
               }
             }
-            if(!included){
+            if (!included) {
               // Client not already subscribed to this topic
-              props.mqttClient.subscribe(String(films[i].id), {qos: 0, retain:true});
+              props.mqttClient.subscribe(String(films[i].id), { qos: 0, retain: true });
               tmpArray.push(parseInt(films[i].id));
               props.setSubscribedTopics(tmpArray);
             }
@@ -264,69 +269,69 @@ function PublicToReviewLayout(props) {
           setFilms(films);
           setDirty(false);
         })
-        .catch(e => { handleErrors(e);  } ); 
+        .catch(e => { handleErrors(e); });
     }
   }, [dirty]);
 
   const deleteFilm = (film) => {
     API.deleteFilm(film)
-      .then(() => { setDirty(true);})
-      .catch(e => handleErrors(e)); 
+      .then(() => { setDirty(true); })
+      .catch(e => handleErrors(e));
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
 
   const selectFilm = (film, user) => {
     console.log("Selecting film " + film.id + " for user " + user.id);
     API.selectFilm(film, user)
       .then(() => { setDirty(true); })
-      .catch(e => {alert('Film is already active for another user!');}); 
+      .catch(e => { alert('Film is already active for another user!'); });
   }
 
   const refreshFilms = pageNumber => {
     API.getPublicFilmsToReview(props.filmManager, pageNumber)
-    .then(films => {
-      for(var i=0; i < films.length; i++){
-        var tmpArray = props.subscribedTopics.slice();
-        var included = false;
-        for(var j=0; j < tmpArray.length; j++){
-          if(tmpArray[j] == parseInt(films[i].id)){
-            included = true;
+      .then(films => {
+        for (var i = 0; i < films.length; i++) {
+          var tmpArray = props.subscribedTopics.slice();
+          var included = false;
+          for (var j = 0; j < tmpArray.length; j++) {
+            if (tmpArray[j] == parseInt(films[i].id)) {
+              included = true;
+            }
+          }
+          if (!included) {
+            // Client not already subscribed to this topic
+            props.mqttClient.subscribe(String(films[i].id), { qos: 0, retain: true });
+            tmpArray.push(parseInt(films[i].id));
+            props.setSubscribedTopics(tmpArray);
           }
         }
-        if(!included){
-          // Client not already subscribed to this topic
-          props.mqttClient.subscribe(String(films[i].id), {qos: 0, retain:true});
-          tmpArray.push(parseInt(films[i].id));
-          props.setSubscribedTopics(tmpArray);
-        }
-      }
-      setFilms(films);
-      setDirty(false);
-    })
-    .catch(e => handleErrors(e));
+        setFilms(films);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
   }
 
   return (
     <>
-      <h1 className="pb-3">Public Films</h1>
+      <h1 className="pb-3">Public Films to review</h1>
       <FilmToReviewTable films={films}
-        deleteFilm={deleteFilm} updateFilm={updateFilm} refreshFilms={refreshFilms} selectFilm={selectFilm} onlineList={props.onlineList} user={props.user} filmSelections={props.filmSelections}/>
+        deleteFilm={deleteFilm} updateFilm={updateFilm} refreshFilms={refreshFilms} selectFilm={selectFilm} onlineList={props.onlineList} user={props.user} filmSelections={props.filmSelections} />
     </>
   )
 }
 
 function AddPublicLayout(props) {
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const addFilm = (filmManager, film) => {
     API.addFilm(filmManager, film)
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
   return (
     <PublicFilmForm filmManager={props.filmManager} addFilm={addFilm} />
@@ -335,30 +340,30 @@ function AddPublicLayout(props) {
 
 function EditPublicLayout() {
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const { filmId } = useParams();
   const [film, setFilm] = useState(null);
 
   const location = useLocation();
 
-  if(location.state == null)  
+  if (location.state == null)
     return <Navigate replace to='/*' />
 
   useEffect(() => {
     API.getFilm(location.state[0].film)
       .then(film => {
-        if(film.owner == parseInt(sessionStorage.getItem('userId')))
+        if (film.owner == parseInt(sessionStorage.getItem('userId')))
           setFilm(film);
       })
       .catch(e => {
-        handleErrors(e); 
-      }); 
+        handleErrors(e);
+      });
   }, [filmId]);
 
   const editFilm = (film) => {
     API.updateFilm(film)
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
 
 
@@ -377,13 +382,13 @@ function ReviewLayout() {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
 
   const { filterLabel } = useParams();
   const filterId = filterLabel || (location.pathname === "/" && 'filter-all');
 
-  if(location.state == null)  
+  if (location.state == null)
     return <Navigate replace to='/*' />
 
   useEffect(() => {
@@ -396,81 +401,133 @@ function ReviewLayout() {
       API.getFilm(location.state[0].film).then(filmObj => {
         setFilm(filmObj)
         API.getFilmReviews(location.state[0].film)
-        .then(reviews => {
-          setReviews(reviews);
-          setDirty(false);
+          .then(reviews => {
+            setReviews(reviews);
+            setDirty(false);
           })
 
       })
-      .catch(e => { handleErrors(e);  } ); 
+        .catch(e => { handleErrors(e); });
     }
   }, [dirty]);
 
   const deleteReview = (review) => {
     API.deleteReview(review)
-      .then(() => { setDirty(true);})
-      .catch(e => handleErrors(e)); 
+      .then(() => { setDirty(true); })
+      .catch(e => handleErrors(e));
   }
 
   const updateReview = (review) => {
     API.updateReview(review)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e)); 
+      .catch(e => handleErrors(e));
   }
 
   const refreshReviews = (film, pageNumber) => {
     API.getFilmReviews(film, pageNumber)
-    .then(review => {
-      setReviews(review);
-      setDirty(false);
-    })
-    .catch(e => handleErrors(e));
+      .then(review => {
+        setReviews(review);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
   }
 
-    return (
-      <>
-        <h1 className="pb-3">Review for Film with ID {filmId}</h1>
-        {film && 
-          <h2>Title: {film.title}</h2>
-        }
-        <FilmReviewTable reviews={reviews} film={film}
-          deleteReview={deleteReview} updateReview={updateReview} refreshReviews={refreshReviews} />
-      </>
-    );
+  return (
+    <>
+      <h1 className="pb-3">Review for Film with ID {filmId}</h1>
+      {film &&
+        <h2>Title: {film.title}</h2>
+      }
+      <FilmReviewTable reviews={reviews} film={film}
+        deleteReview={deleteReview} updateReview={updateReview} refreshReviews={refreshReviews} />
+    </>
+  );
 }
 
-function EditReviewLayout() {
+function EditReviewLayout(props) {
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
   const { filmId } = useParams();
   const [review, setReview] = useState(null);
+  const [currentDraft, setCurrentDraft] = useState(null);
 
   const location = useLocation();
 
-  if(location.state == null)  
+  if (location.state == null)
     return <Navigate replace to='/*' />
+
+  useEffect(() => {
+    if (!props.mqttClient || !review || !review.coreviewerId) return;
+
+    const topic = `films/${filmId}/reviews/${review.reviewerId}/draft`;
+    props.mqttClient.subscribe(topic, { qos: 0, retain: false });
+
+    const onMessage = (receivedTopic, message) => {
+      if (receivedTopic !== topic) return;
+      const parsedMessage = JSON.parse(message);
+      if (parsedMessage.userRole === 'reviewer') return; // echo of our own save, ignore
+      alert('A new draft version has been submitted, reloading the text.');
+      setCurrentDraft(parsedMessage);
+    };
+
+    props.mqttClient.on('message', onMessage);
+
+    return () => {
+      props.mqttClient.unsubscribe(topic);
+      props.mqttClient.removeListener('message', onMessage);
+    };
+  }, [filmId, review]);
+
 
   useEffect(() => {
     API.getReview(location.state[0].review)
       .then(review => {
         setReview(review);
+        if (review.coreviewerId) {
+          return API.getCurrentDraft(review);
+        }
+      })
+      .then(draft => {
+        if (draft) setCurrentDraft(draft);
       })
       .catch(e => {
-        handleErrors(e); 
-      }); 
+        handleErrors(e);
+      });
   }, [filmId]);
 
-  const editReview= (review) => {
+  const editReview = (review) => {
     API.updateReview(review)
-      .catch(e => handleErrors(e)); 
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
 
+  const submitNewDraft = (text) => {
+    return API.submitDraft(review, { ...currentDraft, text })
+      .then(newDraft => {
+        setCurrentDraft(newDraft);
+        return newDraft;
+      })
+      .catch(e => {
+        const msg = e.errors && e.errors[0] && e.errors[0].msg;
+        if (msg === 'The submitted version does not match the expected next version.') {
+          alert('New version of the draft has been submitted by the co-reviewer. Reloading the latest version.');
+          API.getCurrentDraft(review).then(draft => setCurrentDraft(draft));
+        } else {
+          handleErrors(msg || e);
+        }
+        throw e;
+      });
+  }
+
   return (
-    review ? <ReviewForm review={review} editReview={editReview} /> : <><h4 className="pb-3">This review cannot be modified or it does not exists.</h4></>
+    review ? <ReviewForm key={currentDraft ? currentDraft.version : 'no-draft'} review={review} currentDraft={currentDraft} editReview={editReview} submitNewDraft={submitNewDraft} /> : <><h4 className="pb-3">This review cannot be modified or it does not exists.</h4></>
   );
 }
+
 
 function IssueLayout(props) {
 
@@ -482,13 +539,13 @@ function IssueLayout(props) {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
 
 
   const { filterLabel } = useParams();
   const filterId = filterLabel || (location.pathname === "/" && 'filter-all');
 
-  if(location.state == null)  
+  if (location.state == null)
     return <Navigate replace to='/*' />
 
   useEffect(() => {
@@ -507,42 +564,77 @@ function IssueLayout(props) {
           })*/
 
       })
-      .catch(e => { handleErrors(e);  } ); 
+        .catch(e => { handleErrors(e); });
     }
   }, [dirty]);
 
   const getUsers = (filmManager) => {
     API.getUsers(filmManager)
-    .then(users => {
-      setUsers(users);
-      setDirty(false);
-    })
-    .catch(e => handleErrors(e));
+      .then(users => {
+        setUsers(users);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
   }
 
   const issueReview = (film, user) => {
-    API.issueReview (film, user)
-    .then(review => {
-      setIssueMessage("The review has been successfully issued.")
-      setDirty(false);
-    })
-    .catch(e => {handleErrors(e);});
+    API.issueReview(film, user)
+      .then(review => {
+        setIssueMessage("The review has been successfully issued.")
+        setDirty(false);
+      })
+      .catch(e => { handleErrors(e); });
   }
 
-    return (
-      <>
-        <h1 className="pb-3">Issue Review for Film with ID {filmId}</h1>
-        {film && 
-          <h2>Title: {film.title}</h2>
-        }
-        <IssueReviewTable filmId={filmId} film={location.state[0].film} users={users} getUsers={getUsers} issueReview={issueReview} filmManager={props.filmManager}/>
-        <Toast show={issueMessage !== ''} onClose={() => setIssueMessage('')} delay={10000} autohide>
-            <Toast.Body>{ issueMessage }</Toast.Body>
-        </Toast>
-      </>
-    );
+  return (
+    <>
+      <h1 className="pb-3">Issue Review for Film with ID {filmId}</h1>
+      {film &&
+        <h2>Title: {film.title}</h2>
+      }
+      <IssueReviewTable filmId={filmId} film={location.state[0].film} users={users} getUsers={getUsers} issueReview={issueReview} filmManager={props.filmManager} />
+      <Toast show={issueMessage !== ''} onClose={() => setIssueMessage('')} delay={10000} autohide>
+        <Toast.Body>{issueMessage}</Toast.Body>
+      </Toast>
+    </>
+  );
 }
 
+function AssignCoreviewerLayout(props) {
+
+  const { handleErrors } = useContext(MessageContext);
+
+  const location = useLocation();
+
+  if (location.state == null)
+    return <Navigate replace to='/*' />
+
+  const review = location.state[0].review;
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    API.getUsers(props.filmManager)
+      .then(users => { setUsers(users); })
+      .catch(e => handleErrors(e));
+  }, []);
+
+  const appointCoreviewer = (coreviewerId) => {
+    return API.appointCoreviewer(review, coreviewerId)
+      .catch(e => {
+        const msg = e.errors && e.errors[0] && e.errors[0].msg;
+        handleErrors(msg || e);
+        throw e;
+      });
+  }
+
+  return (
+    <>
+      <h1 className="pb-3">Assign Coreviewer for Review {review.reviewerId} - Film {review.filmId}</h1>
+      <AssignCoreviewerForm review={review} users={users} appointCoreviewer={appointCoreviewer} />
+    </>
+  );
+}
 
 
 function NotFoundLayout() {
@@ -585,7 +677,7 @@ function OnlineLayout(props) {
 
   const location = useLocation();
 
-  const {handleErrors} = useContext(MessageContext);
+  const { handleErrors } = useContext(MessageContext);
   const { filterLabel } = useParams();
   const filterId = filterLabel || (location.pathname === "/" && 'filter-all');
   var onlineList = props.onlineList;
@@ -599,13 +691,118 @@ function OnlineLayout(props) {
   return (
     <>
       <h1 className="pb-3">Online Users</h1>
-                    <div className="user">
-                        <OnlineList  usersList={onlineList}/>
-                   </div>  
+      <div className="user">
+        <OnlineList usersList={onlineList} />
+      </div>
     </>
   )
 }
 
+function PublicToCoreviewLayout(props) {
+
+  const [films, setFilms] = useState([]);
+  const [dirty, setDirty] = useState(true);
+
+  const { handleErrors } = useContext(MessageContext);
+
+  useEffect(() => {
+    if (dirty) {
+      API.getCoreviewFilms(props.filmManager)
+        .then(films => {
+          setFilms(films);
+          setDirty(false);
+        })
+        .catch(e => { handleErrors(e); });
+    }
+  }, [dirty]);
+
+  const refreshFilms = pageNumber => {
+    API.getCoreviewFilms(props.filmManager, pageNumber)
+      .then(films => {
+        setFilms(films);
+        setDirty(false);
+      })
+      .catch(e => handleErrors(e));
+  }
+
+  return (
+    <>
+      <h1 className="pb-3">Films to Co-review</h1>
+      <FilmToCoreviewTable films={films} refreshFilms={refreshFilms} />
+    </>
+  )
+}
+function EditCoreviewLayout(props) {
+
+  const { handleErrors } = useContext(MessageContext);
+
+  const { filmId, reviewerId } = useParams();
+  const [review, setReview] = useState(null);
+  const [currentDraft, setCurrentDraft] = useState(null);
+
+  useEffect(() => {
+    const reviewRef = { self: "/api/films/public/" + filmId + "/reviews/" + reviewerId };
+    API.getReview(reviewRef)
+      .then(review => {
+        setReview(review);
+        return API.getCurrentDraft(review);
+      })
+      .then(draft => {
+        setCurrentDraft(draft);
+      })
+      .catch(e => {
+        handleErrors(e);
+      });
+  }, [filmId, reviewerId]);
+
+  useEffect(() => {
+    if (!props.mqttClient) return;
+
+    const topic = `films/${filmId}/reviews/${reviewerId}/draft`;
+    props.mqttClient.subscribe(topic, { qos: 0, retain: false });
+
+    const onMessage = (receivedTopic, message) => {
+      if (receivedTopic !== topic) return;
+      const parsedMessage = JSON.parse(message);
+      if (parsedMessage.userRole === 'coreviewer') return; // echo of our own save, ignore
+      alert('A new draft version has been submitted, reloading the text.');
+      setCurrentDraft(parsedMessage);
+    };
+
+    props.mqttClient.on('message', onMessage);
+
+    // Cleanup function to unsubscribe and remove the listener when the component unmounts or dependencies change
+    return () => {
+      props.mqttClient.unsubscribe(topic);
+      props.mqttClient.removeListener('message', onMessage);
+    };
+  }, [filmId, reviewerId]);
+
+  const submitNewDraft = (text) => {
+    return API.submitDraft(review, { ...currentDraft, text })
+      .then(newDraft => {
+        setCurrentDraft(newDraft);
+      })
+      .catch(e => {
+        const msg = e.errors && e.errors[0] && e.errors[0].msg;
+        if (msg === 'The submitted version does not match the expected next version.') {
+          alert('New version of the draft has been submitted by the co-reviewer. Reloading the latest version.');
+          API.getCurrentDraft(review).then(draft => setCurrentDraft(draft));
+        } else {
+          handleErrors(msg || e);
+        }
+        throw e;
+      });
+  }
+
+  return (
+    review && currentDraft ?
+      <CoreviewForm key={currentDraft.version} review={review} currentDraft={currentDraft} submitNewDraft={submitNewDraft} />
+      : <><h4 className="pb-3">Loading...</h4></>
+  );
+}
 
 
-export { DefaultLayout, AddPrivateLayout, EditPrivateLayout, AddPublicLayout, EditPublicLayout, EditReviewLayout, NotFoundLayout, LoginLayout, PrivateLayout, PublicLayout, PublicToReviewLayout, ReviewLayout, IssueLayout, LoadingLayout, OnlineLayout }; 
+
+
+export { DefaultLayout, AddPrivateLayout, EditPrivateLayout, AddPublicLayout, EditPublicLayout, EditReviewLayout, NotFoundLayout, LoginLayout, PrivateLayout, PublicLayout, PublicToReviewLayout, ReviewLayout, IssueLayout, LoadingLayout, OnlineLayout, PublicToCoreviewLayout, EditCoreviewLayout, AssignCoreviewerLayout };

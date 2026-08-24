@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id" : "http://www.my-schema.com/draft_mqtt_message_schema.json",
+  "title": "MQTT Message",
+  "description": "JSON Schema for draft MQTT Message",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "path to the JSON Schema to use for the validation of the JSON file describing the draft MQTT Message"
+    },
+    "version": {
+      "type": "integer",
+      "description": "current version name of the draft",
+      "minimum": 0
+    },
+    "text": {
+      "type": "string",
+      "description": "text content of the draft",
+      "maxLength": 1000
+    },
+    "userRole": {
+      "type": "string",
+      "description": "role of the user",
+      "enum": ["reviewer", "coreviewer"]
+    }
+  },
+  "required": ["version", "text", "userRole"]
+}

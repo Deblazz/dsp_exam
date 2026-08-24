@@ -7,6 +7,7 @@ class FilmManager{
         this.reviewAssignments = "/api/films/public/assignments";
         this.users = "/api/users/";
         this.usersAuthenticator = "/api/users/authenticator";
+        this.coreviewerInvitedFilms = "/api/films/public/coreviewer-invited";
     }
 }
 

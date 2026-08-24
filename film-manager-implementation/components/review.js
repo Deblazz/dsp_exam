@@ -1,23 +1,24 @@
-class Review{    
+class Review {
     constructor(filmId, reviewerId, completed, reviewDate, rating, review, coreviewerId) {
         this.filmId = filmId;
         this.reviewerId = reviewerId;
         this.completed = completed;
 
         var selfLink = "/api/films/public/" + this.filmId + "/reviews/" + this.reviewerId;
-        this.self =  selfLink;
+        this.self = selfLink;
 
-        if(coreviewerId){
+        if (coreviewerId) {
             this.coreviewerId = coreviewerId;
             this.drafts = selfLink + "/drafts";
         }
-        if(reviewDate)
+        if (reviewDate)
             this.reviewDate = reviewDate;
-        if(rating)
+        if (typeof rating === 'number' && rating >= 0 && rating <= 10) {
             this.rating = rating;
-        if(review)
+        }
+        if (review)
             this.review = review;
-        
+
     }
 }
 
