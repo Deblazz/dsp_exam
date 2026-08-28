@@ -59,8 +59,8 @@ module.exports.completeSingleReview = function completeSingleReview (req, res, n
         utils.writeJson(res, response, 204);
     })
     .catch(function(response) {
-        if(response == "USER_NOT_REVIEWER"){
-            utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The user is not a reviewer of the film' }], }, 403);
+        if(response == "ALREADY_COMPLETED"){
+            utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The review has already been completed.' }], }, 409);
         }
         else if (response == "REVIEW_TEXT_REQUIRED") {
             utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'The review property is required when no co-reviewer has been appointed.' }], }, 400);

@@ -11,7 +11,7 @@ const PrivateFilmForm = (props) => {
   const [title, setTitle] = useState(props.film ? props.film.title : '');
   const [favorite, setFavorite] = useState(props.film ? props.film.favorite : false);
   const [watchDate, setWatchDate] = useState(props.film ? ((props.film.watchDate != undefined && props.film.watchDate != "") ? props.film.watchDate.format('YYYY-MM-DD') : "") : dayjs().format('YYYY-MM-DD'));
-  const [rating, setRating] = useState(props.film ? props.film.rating : 0);
+  const [rating, setRating] = useState(props.film ? props.film.rating : 1);
   const [privateFilm, setPrivateFilm] = useState(props.film ? props.film.private : true);
 
   const navigate = useNavigate();
@@ -70,7 +70,7 @@ const PrivateFilmForm = (props) => {
       <Form.Group className="mb-3">
         <Form.Label>Rating</Form.Label>
         <Form.Select aria-label="Rating" defaultValue={rating} onChange={event => setRating(event.target.value)}>
-          { [...Array(11)].map( (v, i) => <option key={i} value={i}>{i}</option>) }
+          { [...Array(10)].map( (v, i) => <option key={i+1} value={i+1}>{i+1}</option>) }
         </Form.Select>
       </Form.Group>
 

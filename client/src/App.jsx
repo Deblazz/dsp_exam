@@ -40,7 +40,9 @@ function App() {
   // If an error occurs, the error message will be shown in a toast.
   const handleErrors = (err) => {
     let msg = '';
-    if (err.error) msg = err.error;
+    // Actually show the user the contents of the error message
+    if (err.errors && err.errors[0] && err.errors[0].msg) msg = err.errors[0].msg;
+    else if (err.error) msg = err.error;
     else if (typeof (err) === "string") msg = String(err);
     else msg = "Error";
     setMessage(msg); // WARN: a more complex application requires a queue of messages. In this example only last error is shown.
@@ -108,6 +110,8 @@ function Main() {
       console.log(`WebSocket error: ${error}`)
     };
 
+
+    // onmessage, call messageReceived
     ws.onmessage = (e) => {
       console.log('WebSocket message received:', e.data.toString()); //TEST
       try {
@@ -117,8 +121,11 @@ function Main() {
       }
     };
 
+    // This function is called when a message is received from the WebSocket server.
     const messageReceived = (e) => {
       let datas = JSON.parse(e.data.toString());
+
+      // Update the online list based on the type of message received (login, logout, update).
       if (datas.typeMessage == "login") {
         setOnlineList(currentArray => {
           var newArray = [...currentArray];
@@ -178,13 +185,14 @@ function Main() {
     mqttClient.on('connect', () => {
       console.log('client connected: ' + clientId);
     });
+
     mqttClient.on('message', (topic, message) => {
       // Differentiate between drafts and film selections by checking if the topic is a number (filmId) or not.
       if (!isNaN(topic)) {
         try {
           console.log('Received message from topic: ' + topic + ' with message: ' + message);
           var parsedMessage = JSON.parse(message);
-          if (parsedMessage.typeMessage == "deleted") {
+          if (parsedMessage.status == "deleted") {
             mqttClient.unsubscribe(topic);
           }
           displayFilmSelection(topic, parsedMessage);
@@ -198,6 +206,7 @@ function Main() {
       console.log(clientId + ' disconnected');
     });
 
+    // Update the filmSelections state based on the received message, used in the PublicToReviewLayout component to display the film selections. 
     const displayFilmSelection = (topic, parsedMessage) => {
       setFilmSelections(currentArray => {
         var newArray = [...currentArray];
@@ -222,6 +231,7 @@ function Main() {
       const filters = ['private', 'public', 'public/to_review', 'public/to_coreview', 'online'];
       setFilters(filters);
 
+      // Check if the user is already logged in by checking the sessionStorage.
       if (sessionStorage.getItem('user') != undefined) {
         setUser(sessionStorage.getItem('user'));
         setLoggedIn(true);

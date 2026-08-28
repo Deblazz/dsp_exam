@@ -54,7 +54,7 @@
       "description": "hyperlink to the drafts of the review, ignored on write if present"
     }
   },
-  "required": ["filmId", "reviewerId", "completed"],
+  "required": ["completed"],
   "dependencies": {
     "completed": {
       "oneOf": [

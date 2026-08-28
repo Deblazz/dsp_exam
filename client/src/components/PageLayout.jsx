@@ -701,26 +701,19 @@ function OnlineLayout(props) {
 function PublicToCoreviewLayout(props) {
 
   const [films, setFilms] = useState([]);
-  const [dirty, setDirty] = useState(true);
 
   const { handleErrors } = useContext(MessageContext);
 
   useEffect(() => {
-    if (dirty) {
-      API.getCoreviewFilms(props.filmManager)
-        .then(films => {
-          setFilms(films);
-          setDirty(false);
-        })
-        .catch(e => { handleErrors(e); });
-    }
-  }, [dirty]);
+    API.getCoreviewFilms(props.filmManager)
+      .then(films => setFilms(films))
+      .catch(e => { handleErrors(e); });
+  }, []);
 
   const refreshFilms = pageNumber => {
     API.getCoreviewFilms(props.filmManager, pageNumber)
       .then(films => {
         setFilms(films);
-        setDirty(false);
       })
       .catch(e => handleErrors(e));
   }
@@ -732,6 +725,7 @@ function PublicToCoreviewLayout(props) {
     </>
   )
 }
+
 function EditCoreviewLayout(props) {
 
   const { handleErrors } = useContext(MessageContext);
@@ -755,16 +749,21 @@ function EditCoreviewLayout(props) {
       });
   }, [filmId, reviewerId]);
 
+  // Subscribe to MQTT topic for draft updates
   useEffect(() => {
     if (!props.mqttClient) return;
 
     const topic = `films/${filmId}/reviews/${reviewerId}/draft`;
+
+    // Set retain and qos
     props.mqttClient.subscribe(topic, { qos: 0, retain: false });
 
+    // Define the message handler
     const onMessage = (receivedTopic, message) => {
       if (receivedTopic !== topic) return;
       const parsedMessage = JSON.parse(message);
       if (parsedMessage.userRole === 'coreviewer') return; // echo of our own save, ignore
+      // Otherwise, alert the user and update the current draft, version coming from the reviewer
       alert('A new draft version has been submitted, reloading the text.');
       setCurrentDraft(parsedMessage);
     };
@@ -785,8 +784,10 @@ function EditCoreviewLayout(props) {
       })
       .catch(e => {
         const msg = e.errors && e.errors[0] && e.errors[0].msg;
+
+        // Version error
         if (msg === 'The submitted version does not match the expected next version.') {
-          alert('New version of the draft has been submitted by the co-reviewer. Reloading the latest version.');
+          alert('New version of the draft has been submitted by the reviewer. Reloading the latest version.');
           API.getCurrentDraft(review).then(draft => setCurrentDraft(draft));
         } else {
           handleErrors(msg || e);

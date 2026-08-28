@@ -77,7 +77,7 @@ const ReviewForm = (props) => {
 
       <Form.Group className="mb-3">
         <Form.Label>Rating</Form.Label>
-        <Form.Select aria-label="Rating" defaultValue={rating} onChange={event => setRating(event.target.value)}>
+        <Form.Select aria-label="Rating" defaultValue={rating} onChange={event => setRating(parseInt(event.target.value))}>
           {[...Array(11)].map((v, i) => <option key={i} value={i}>{i}</option>)}
         </Form.Select>
       </Form.Group>

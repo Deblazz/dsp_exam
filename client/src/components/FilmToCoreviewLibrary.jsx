@@ -23,7 +23,7 @@ function FilmToCoreviewTable(props) {
         itemClass="page-item"
         linkClass="page-link"
         activePage={parseInt(sessionStorage.getItem("currentPage"))}
-        itemsCountPerPage={parseInt(sessionStorage.getItem("totalItems"))/parseInt(sessionStorage.getItem("totalPages"))}
+        itemsCountPerPage={parseInt(sessionStorage.getItem("totalItems")) / parseInt(sessionStorage.getItem("totalPages"))}
         totalItemsCount={parseInt(sessionStorage.getItem("totalItems"))}
         pageRangeDisplayed={10}
         onChange={handlePageChange}
@@ -43,7 +43,7 @@ function CoreviewFilmRow(props) {
       </td>
       <td>
         <Link to={"/public/" + props.filmData.id + "/reviews/" + props.filmData.reviewerId + "/coreview"}
-              state={[{film: props.filmData}, {nextpage: location.pathname}]}>
+          state={[{ film: props.filmData }, { nextpage: location.pathname }]}>
           <Button variant="primary">Edit Draft</Button>{' '}
         </Link>
       </td>
