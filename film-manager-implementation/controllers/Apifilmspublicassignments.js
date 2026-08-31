@@ -3,7 +3,7 @@
 var utils = require('../utils/writer.js');
 const filmService = require('../service/FilmsService.js');
 
-module.exports.assignReviewBalanced = function assignReviewBalanced (req, res, next) {
+module.exports.assignReviewBalanced = function assignReviewBalanced(req, res, next) {
   filmService.assignReviewBalanced()
     .then(function (response) {
       utils.writeJson(res, response);

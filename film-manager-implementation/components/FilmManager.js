@@ -1,4 +1,4 @@
-class FilmManager{    
+class FilmManager {
     constructor() {
         this.films = "/api/films/";
         this.privateFilms = "/api/films/private/";

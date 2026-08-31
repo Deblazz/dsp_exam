@@ -40,10 +40,10 @@ module.exports.getSinglePrivateFilm = function getSinglePrivateFilm(req, res, ne
 };
 
 module.exports.updateSinglePrivateFilm = function updateSinglePrivateFilm(req, res, next) {
-    if(req.body.private == false){
-      utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'Cannot change visibility'}], }, 409);
-      return;
-    }
+  if (req.body.private == false) {
+    utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'Cannot change visibility' }], }, 409);
+    return;
+  }
   filmService.updateSinglePrivateFilm(req.body, req.params.filmId, req.user.id)
     .then(function (response) {
       utils.writeJson(res, response, 204);

@@ -1,4 +1,4 @@
-class DraftMessage {    
+class DraftMessage {
     constructor(version, text, userRole) {
 
         this.version = version;

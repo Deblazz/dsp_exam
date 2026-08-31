@@ -11,7 +11,7 @@ var options = {
   clientId: clientId,
   clean: true,
   reconnectPeriod: 60000,
-  connectTimeout: 30*1000,
+  connectTimeout: 30 * 1000,
   will: {
     topic: 'WillMsg',
     payload: 'Connection Closed abnormally..!',
@@ -32,12 +32,12 @@ mqtt_connection.on('connect', function () {
   console.log('client connected:' + clientId)
 
   serviceUtils.getFilmSelections().then(function (selections) {
-    selections.forEach(function(selection){
+    selections.forEach(function (selection) {
       var status = (selection.userId) ? "active" : "inactive";
       var message = new MQTTMessage(status, selection.userId, selection.userName);
       mqtt_connection.publish(String(selection.filmId), JSON.stringify(message), { qos: 0, retain: true });
     });
-  }) .catch(function (error) {
+  }).catch(function (error) {
     mqtt_connection.end();
   });
 })
@@ -47,9 +47,9 @@ mqtt_connection.on('close', function () {
 })
 
 module.exports.publishFilmMessage = function publishFilmMessage(filmId, message) {
-    mqtt_connection.publish(String(filmId), JSON.stringify(message), { qos: 0, retain: true })
+  mqtt_connection.publish(String(filmId), JSON.stringify(message), { qos: 0, retain: true })
 };
 
 module.exports.publishDraftMessage = function publishDraftMessage(filmId, reviewerId, message) {
-    mqtt_connection.publish(`films/${filmId}/reviews/${reviewerId}/draft`, JSON.stringify(message), { qos: 0, retain: false })
+  mqtt_connection.publish(`films/${filmId}/reviews/${reviewerId}/draft`, JSON.stringify(message), { qos: 0, retain: false })
 }

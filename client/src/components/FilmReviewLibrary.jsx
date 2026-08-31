@@ -61,7 +61,7 @@ function FilmReviewRow(props) {
         }
         &nbsp; &nbsp;
         {
-          props.filmData.owner == sessionStorage.getItem("userId") &&
+          props.filmData.owner == sessionStorage.getItem("userId") && !props.reviewData.completed &&
           <Link to={"/public/" + props.reviewData.filmId + "/reviews"} state={[{ film: props.filmData }, { nextpage: location.pathname }]}>
             <i className="bi bi-trash" onClick={() => { props.deleteReview(props.reviewData) }} />
           </Link>

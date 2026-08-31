@@ -14,13 +14,13 @@ module.exports.getFilmReviews = function getFilmReviews(req, res, next) {
     .then(function (response) {
 
       numOfReviews = response;
-      if(numOfReviews == 0){
-         return utils.writeJson(res, {
-              totalPages: 1,
-              currentPage: 1,
-              totalItems: 0,
-              reviews: [],
-            });
+      if (numOfReviews == 0) {
+        return utils.writeJson(res, {
+          totalPages: 1,
+          currentPage: 1,
+          totalItems: 0,
+          reviews: [],
+        });
       }
       reviewService.getFilmReviews(req.query.pageNo, req.params.filmId)
         .then(function (response) {
@@ -61,7 +61,7 @@ module.exports.getFilmReviews = function getFilmReviews(req, res, next) {
 
 module.exports.issueFilmReview = function issueFilmReview(req, res, next) {
   if (!Array.isArray(req.body)) {
-    return utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': "The request body must be an array of review objects." }]}, 400);
+    return utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': "The request body must be an array of review objects." }] }, 400);
   }
 
   var differentFilm = false;

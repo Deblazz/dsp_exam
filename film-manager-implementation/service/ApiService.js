@@ -9,7 +9,7 @@ const FilmManager = require("../components/FilmManager");
  *
  * returns FilmManager
  **/
-exports.getFilmManager = function() {   
-   return new Promise((resolve, reject) => {resolve(new FilmManager())})
+exports.getFilmManager = function () {
+   return new Promise((resolve, reject) => { resolve(new FilmManager()) })
 }
 

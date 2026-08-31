@@ -512,6 +512,8 @@ exports.getCurrentReviewDraft = function (filmId, reviewerId, userId) {
         db.all(sql2, [filmId, reviewerId], (err, rows) => {
           if (err)
             reject(err);
+          else if (rows.length === 0)
+            reject("NO_DRAFT_FOUND");
           else {
             resolve(rows[0]);
           }

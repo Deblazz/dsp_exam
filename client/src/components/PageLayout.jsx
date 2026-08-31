@@ -88,13 +88,19 @@ function PrivateLayout(props) {
   const deleteFilm = (film) => {
     API.deleteFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => { handleErrors(e) });
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const refreshFilms = pageNumber => {
@@ -198,13 +204,19 @@ function PublicLayout(props) {
   const deleteFilm = (film) => {
     API.deleteFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const refreshFilms = pageNumber => {
@@ -276,13 +288,19 @@ function PublicToReviewLayout(props) {
   const deleteFilm = (film) => {
     API.deleteFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const updateFilm = (film) => {
     API.updateFilm(film)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const selectFilm = (film, user) => {
@@ -415,13 +433,19 @@ function ReviewLayout() {
   const deleteReview = (review) => {
     API.deleteReview(review)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const updateReview = (review) => {
     API.updateReview(review)
       .then(() => { setDirty(true); })
-      .catch(e => handleErrors(e));
+      .catch(e => {
+        const msg = e.errObj && e.errObj.errors && e.errObj.errors[0] && e.errObj.errors[0].msg;
+        handleErrors(msg || e);
+      });
   }
 
   const refreshReviews = (film, pageNumber) => {

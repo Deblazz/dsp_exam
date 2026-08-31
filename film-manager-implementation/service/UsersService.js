@@ -15,30 +15,30 @@ const WSMessage = require('../components/ws_message');
  * body User The data of the user who wants to perform log in. The data structure must contain email and password.
  * no response value expected for this operation
  **/
-exports.authenticateUser = function(req, res, next) {
+exports.authenticateUser = function (req, res, next) {
   return new Promise((resolve, reject) => {
-      passport.authenticate('local', (err, user, info) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) return reject(err);
+      if (!user) return reject('NO_USER');
+      req.login(user, (err) => {
         if (err) return reject(err);
-        if (!user) return reject('NO_USER');
-        req.login(user, (err) => {
-          if (err) return reject(err);
-          // Notify all the clients that a user has logged in
-          console.log("User asking for log in: " + user.name);
-          serviceUtils.getActiveFilmUser(user.id)
-            .then((film) => {
-              console.log("WebSocket login notification");
-              var loginMessage;
-              if(film == undefined) loginMessage = new WSMessage('login', user.id, user.name, undefined, undefined);
-              else loginMessage = new WSMessage('login', user.id, user.name, film.id, film.title);
-              WebSocket.sendAllClients(loginMessage);
-              WebSocket.saveMessage(user.id, loginMessage);
-            }).catch((err) => {
-              console.log("Error retrieving active film for user " + user.name + ": " + err);
-            });
-          return resolve(new User( user.id, user.name, req.body.email));
-        });
-      })(req, res, next);
-    });
+        // Notify all the clients that a user has logged in
+        console.log("User asking for log in: " + user.name);
+        serviceUtils.getActiveFilmUser(user.id)
+          .then((film) => {
+            console.log("WebSocket login notification");
+            var loginMessage;
+            if (film == undefined) loginMessage = new WSMessage('login', user.id, user.name, undefined, undefined);
+            else loginMessage = new WSMessage('login', user.id, user.name, film.id, film.title);
+            WebSocket.sendAllClients(loginMessage);
+            WebSocket.saveMessage(user.id, loginMessage);
+          }).catch((err) => {
+            console.log("Error retrieving active film for user " + user.name + ": " + err);
+          });
+        return resolve(new User(user.id, user.name, req.body.email));
+      });
+    })(req, res, next);
+  });
 }
 
 /**
@@ -47,24 +47,24 @@ exports.authenticateUser = function(req, res, next) {
  *
  * no response value expected for this operation
  **/
-exports.logoutUser = function(res, req) {
-  return new Promise(function(resolve, reject) {
-      const email = req.user.email;
-      serviceUtils.getUserByEmail(email)
-        .then((user) => {
-          if (user === undefined) {
-            reject("NO_USER");
-          } else {
-            req.logout(() => {
-              // Notify all the clients that a user has logged out
-              console.log("WebSocket logout notification");
-              var logoutMessage = new WSMessage('logout', user.id, user.name);
-              WebSocket.sendAllClients(logoutMessage);
-              WebSocket.deleteMessage(user.id);
-              resolve()
-            });
-          }
-        })
+exports.logoutUser = function (res, req) {
+  return new Promise(function (resolve, reject) {
+    const email = req.user.email;
+    serviceUtils.getUserByEmail(email)
+      .then((user) => {
+        if (user === undefined) {
+          reject("NO_USER");
+        } else {
+          req.logout(() => {
+            // Notify all the clients that a user has logged out
+            console.log("WebSocket logout notification");
+            var logoutMessage = new WSMessage('logout', user.id, user.name);
+            WebSocket.sendAllClients(logoutMessage);
+            WebSocket.deleteMessage(user.id);
+            resolve()
+          });
+        }
+      })
   });
 }
 

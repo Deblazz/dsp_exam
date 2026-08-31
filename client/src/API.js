@@ -145,7 +145,7 @@ async function updateFilm(film) {
     body: JSON.stringify(film) // dayjs date is serialized correctly by the .toJSON method override
   })
   if (!response.ok) {
-    let err = { status: response.status, errObj: response.json() };
+    let err = { status: response.status, errObj: await response.json() };
     throw err;
   }
   return response.ok;
@@ -178,7 +178,7 @@ async function deleteFilm(film) {
     credentials: 'include'
   });
   if (!response.ok) {
-    let err = { status: response.status, errObj: response.json() };
+    let err = { status: response.status, errObj: await response.json() };
     throw err;
   }
   return response.ok;
@@ -212,7 +212,7 @@ async function deleteReview(review) {
     credentials: 'include'
   });
   if (!response.ok) {
-    let err = { status: response.status, errObj: response.json() };
+    let err = { status: response.status, errObj: await response.json() };
     throw err;
   }
   return response.ok;
@@ -243,7 +243,7 @@ async function updateReview(review) {
     body: JSON.stringify(review) // dayjs date is serialized correctly by the .toJSON method override
   })
   if (!response.ok) {
-    let err = { status: response.status, errObj: response.json() };
+    let err = { status: response.status, errObj: await response.json() };
     throw err;
   }
   return response.ok;

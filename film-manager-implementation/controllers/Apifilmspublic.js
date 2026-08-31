@@ -11,13 +11,13 @@ module.exports.getPublicFilms = function getPublicFilms(req, res, next) {
   filmService.getPublicFilmsTotal()
     .then(function (response) {
       numOfFilms = response;
-      if(numOfFilms == 0){
-         return utils.writeJson(res, {
-              totalPages: 1,
-              currentPage: 1,
-              totalItems: 0,
-              films: [],
-            });
+      if (numOfFilms == 0) {
+        return utils.writeJson(res, {
+          totalPages: 1,
+          currentPage: 1,
+          totalItems: 0,
+          films: [],
+        });
       }
       filmService.getPublicFilms(req.query.pageNo)
         .then(function (response) {

@@ -13,8 +13,8 @@ const db = new sqlite.Database(DBSOURCE, (err) => {
         throw err;
     }
     console.log('Connected to the SQLite database (' + DBSOURCE + ').');
-    db.exec('PRAGMA foreign_keys = ON;', function(error)  {
-        if (error){
+    db.exec('PRAGMA foreign_keys = ON;', function (error) {
+        if (error) {
             console.error("Pragma statement didn't work.")
         }
     });

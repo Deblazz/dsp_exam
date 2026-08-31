@@ -11,13 +11,13 @@ module.exports.getPrivateFilms = function getPrivateFilms(req, res, next) {
   filmService.getPrivateFilmsTotal(req.user.id)
     .then(function (response) {
       numOfFilms = response;
-      if(numOfFilms == 0){
-         return utils.writeJson(res, {
-              totalPages: 1,
-              currentPage: 1,
-              totalItems: 0,
-              films: [],
-            });
+      if (numOfFilms == 0) {
+        return utils.writeJson(res, {
+          totalPages: 1,
+          currentPage: 1,
+          totalItems: 0,
+          films: [],
+        });
       }
       filmService.getPrivateFilms(req.user.id, req.query.pageNo)
         .then(function (response) {
