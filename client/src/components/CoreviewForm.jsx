@@ -40,8 +40,7 @@ const CoreviewForm = (props) => {
 
       <Form.Group className="mb-3">
         <Form.Label>Review Date</Form.Label>
-        <Form.Control type="date" value={props.review.reviewDate ? props.review.reviewDate.format('YYYY-MM-DD') : ''} disabled />
-      </Form.Group>
+        <Form.Control type="date" value={props.review.reviewDate ? props.review.reviewDate : ''} disabled />      </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Rating</Form.Label>

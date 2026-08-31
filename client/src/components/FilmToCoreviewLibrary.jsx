@@ -42,10 +42,13 @@ function CoreviewFilmRow(props) {
         <p className="keep-white-space">{`${props.filmData.title}`}</p>
       </td>
       <td>
-        <Link to={"/public/" + props.filmData.id + "/reviews/" + props.filmData.reviewerId + "/coreview"}
-          state={[{ film: props.filmData }, { nextpage: location.pathname }]}>
-          <Button variant="primary">Edit Draft</Button>{' '}
-        </Link>
+        {
+          !props.filmData.completed &&
+          <Link to={"/public/" + props.filmData.id + "/reviews/" + props.filmData.reviewerId + "/coreview"}
+            state={[{ film: props.filmData }, { nextpage: location.pathname }]}>
+            <Button variant="primary">Edit Draft</Button>{' '}
+          </Link>
+        }
       </td>
     </tr>
   );

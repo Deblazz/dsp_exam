@@ -9,7 +9,7 @@ class Film{
 
         if(watchDate)
             this.watchDate = watchDate;
-        if(rating)
+        if(typeof rating === 'number' && rating >= 0 && rating <= 10)
             this.rating = rating;
         if(favorite)
             this.favorite = favorite;

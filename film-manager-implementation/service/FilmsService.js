@@ -486,7 +486,7 @@ exports.getCoreviewerInvitedFilmsTotal = function (coreviewerId) {
  **/
 exports.getCoreviewerInvitedFilms = function (coreviewerId, pageNo) {
   return new Promise((resolve, reject) => {
-    var sql = "SELECT f.id as fid, f.title, f.owner, f.private, f.watchDate, f.rating, f.favorite, r.reviewerId, c.total_rows FROM films f, reviews r, (SELECT count(*) total_rows FROM films f2, reviews r2 WHERE f2.private=0 AND f2.id = r2.filmId AND r2.coreviewerId = ?) c WHERE  f.private = 0 AND f.id = r.filmId AND r.coreviewerId = ?"
+    var sql = "SELECT f.id as fid, f.title, f.owner, f.private, f.watchDate, f.rating, f.favorite, r.reviewerId, r.completed, c.total_rows FROM films f, reviews r, (SELECT count(*) total_rows FROM films f2, reviews r2 WHERE f2.private=0 AND f2.id = r2.filmId AND r2.coreviewerId = ?) c WHERE  f.private = 0 AND f.id = r.filmId AND r.coreviewerId = ?"
     var limits = serviceUtils.getFilmPagination(pageNo);
     if (limits.length != 0) sql = sql + " LIMIT ?,?";
     limits.unshift(coreviewerId);

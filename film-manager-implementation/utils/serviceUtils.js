@@ -32,7 +32,9 @@ exports.createFilm = function (row) {
     var favoriteFilm;
     if (row.favorite == null) favoriteFilm = undefined;
     else favoriteFilm = (row.favorite === 1) ? true : false;
-    return new Film(row.fid, row.title, row.owner, privateFilm, row.watchDate, row.rating, favoriteFilm, row.reviewerId);
+    var film = new Film(row.fid, row.title, row.owner, privateFilm, row.watchDate, row.rating, favoriteFilm, row.reviewerId);
+    if (row.completed != null) film.completed = (row.completed === 1) ? true : false;
+    return film;
 }
 
 

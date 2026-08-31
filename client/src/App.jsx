@@ -233,7 +233,7 @@ function Main() {
 
       // Check if the user is already logged in by checking the sessionStorage.
       if (sessionStorage.getItem('user') != undefined) {
-        setUser(sessionStorage.getItem('user'));
+        setUser(JSON.parse(sessionStorage.getItem('user')));
         setLoggedIn(true);
         setLoading(false);
       } else {

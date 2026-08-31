@@ -16,7 +16,7 @@ module.exports.getPublicFilms = function getPublicFilms(req, res, next) {
               totalPages: 1,
               currentPage: 1,
               totalItems: 0,
-              reviews: [],
+              films: [],
             });
       }
       filmService.getPublicFilms(req.query.pageNo)

@@ -54,7 +54,7 @@ function FilmReviewRow(props) {
     <tr>
       <td>
         {
-          props.reviewData.reviewerId == sessionStorage.getItem("userId") &&
+          props.reviewData.reviewerId == sessionStorage.getItem("userId") && !props.reviewData.completed &&
           <Link to={"/public/" + props.reviewData.filmId + "/reviews/complete"} state={[{ review: props.reviewData }, { nextpage: location.pathname }]}>
             <i className="bi bi-pencil-square" />
           </Link>
@@ -84,7 +84,7 @@ function FilmReviewRow(props) {
         {props.reviewData.reviewDate ? <small>{formatWatchDate(props.reviewData.reviewDate, 'MMMM D, YYYY')}</small> : ''}
       </td>
       <td>
-        {props.reviewData.rating ? <Rating rating={props.reviewData.rating} maxStars={10} /> : ''}
+        {props.reviewData.rating != undefined ? <Rating rating={props.reviewData.rating} maxStars={10} /> : ''}
       </td>
       <td>
         {props.reviewData.review ?

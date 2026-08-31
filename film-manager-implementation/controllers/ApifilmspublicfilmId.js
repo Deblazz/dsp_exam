@@ -40,6 +40,7 @@ module.exports.getSinglePublicFilm = function getSinglePublicFilm(req, res, next
 module.exports.updateSinglePublicFilm = function updateSinglePublicFilm(req, res, next) {
   if(req.body.private == true){
     utils.writeJson(res, { errors: [{ 'param': 'Server', 'msg': 'Cannot change visibility'}], }, 409);
+    return;
   }
   filmService.updateSinglePublicFilm(req.body, req.params.filmId, req.user.id)
     .then(function (response) {

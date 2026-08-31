@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 /**
  * Constructor function for new Film objects
 */
-function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self, reviews, reviewerId } = {}) {
+function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self, reviews, reviewerId, completed } = {}) {
 
     if(id)
          this.id = id;
@@ -17,10 +17,12 @@ function Film({ id, title, owner, privateFilm, watchDate, rating, favorite, self
         
     if(reviewerId)
         this.reviewerId = reviewerId;
-    if(rating)
+    if(typeof rating === 'number' && rating >= 0 && rating <= 10)
         this.rating = parseInt(rating);
     if(favorite != undefined)
         this.favorite = favorite;
+    if(completed != undefined)
+        this.completed = completed;
     if(self)
         this.self = self;
     if(reviews)

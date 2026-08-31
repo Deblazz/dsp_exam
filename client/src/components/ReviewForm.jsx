@@ -13,7 +13,7 @@ const ReviewForm = (props) => {
   const [reviewerId, setReviewerId] = useState(props.review ? props.review.reviewerId : '');
   const [completed, setCompleted] = useState(props.review ? true : false);
   const [reviewDate, setReviewDate] = useState(props.review ? ((props.review.reviewDate != undefined && props.review.reviewDate != "") ? props.review.reviewDate : "") : dayjs().format('YYYY-MM-DD'));
-  const [rating, setRating] = useState(props.review ? props.review.rating : 0);
+  const [rating, setRating] = useState(props.review && props.review.rating != undefined ? props.review.rating : 0);
   const [review, setReview] = useState(props.currentDraft ? props.currentDraft.text : (props.review ? props.review.review : 0));
   const [self, setSelf] = useState(props.review ? props.review.self : undefined);
 

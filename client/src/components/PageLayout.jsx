@@ -125,8 +125,8 @@ function AddPrivateLayout(props) {
   const { handleErrors } = useContext(MessageContext);
 
   const addFilm = (filmManager, film) => {
-    API.addFilm(filmManager, film)
-      .catch(e => handleErrors(e));
+    return API.addFilm(filmManager, film)
+      .catch(e => { handleErrors(e); throw e; });
   }
   return (
     <PrivateFilmForm filmManager={props.filmManager} addFilm={addFilm} />
@@ -157,8 +157,8 @@ function EditPrivateLayout() {
   }, [filmId]);
 
   const editFilm = (film) => {
-    API.updateFilm(film)
-      .catch(e => handleErrors(e));
+    return API.updateFilm(film)
+      .catch(e => { handleErrors(e); throw e; });
   }
 
   return (
@@ -330,8 +330,8 @@ function AddPublicLayout(props) {
   const { handleErrors } = useContext(MessageContext);
 
   const addFilm = (filmManager, film) => {
-    API.addFilm(filmManager, film)
-      .catch(e => handleErrors(e));
+    return API.addFilm(filmManager, film)
+      .catch(e => { handleErrors(e); throw e; });
   }
   return (
     <PublicFilmForm filmManager={props.filmManager} addFilm={addFilm} />
@@ -362,9 +362,10 @@ function EditPublicLayout() {
   }, [filmId]);
 
   const editFilm = (film) => {
-    API.updateFilm(film)
-      .catch(e => handleErrors(e));
+    return API.updateFilm(film)
+      .catch(e => { handleErrors(e); throw e; });
   }
+
 
 
   return (
